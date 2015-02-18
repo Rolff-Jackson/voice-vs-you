@@ -1,26 +1,48 @@
 /**
  * Created by mazurkiewicz on 11/02/15.
  */
+function extractDim(data,debut,fin,dim) {
+  var res = [];
+  for(var k=debut; k < fin;k++) {
+    res.push(data[k][dim]);
+  }
 
+  return res;
+}
 function traitementFFT(data,incr) {
 
   var N = data.length;
   var nbEltAnalyse = Math.pow(2,Math.floor(Math.log(N)/Math.log(2)));
-  var soundData = data.subarray(0,nbEltAnalyse);
-  var fftData = fft(soundData,0);
+  if ( N > 0 ) {
+    var soundData = [];
+    if ( data[0].length > 1 ) {
+      soundData = extractDim(data,0,nbEltAnalyse,1);
+      console.log(soundData);
+    }
+    else {
+      soundData = data.subarray(0,nbEltAnalyse);
+    }
 
-  var fftReverse= [];
-  var infoFFT = [];
+    var fftData = fft(soundData,0);
 
-  if ( fftData != null ) {
+    var fftReverse= [];
+    var infoFFT = [];
 
-    fftReverse = inverseFFT(fftData, incr);
-    infoFFT = amplitudePhase(fftData, incr);
+    if ( fftData != null ) {
 
+      fftReverse = inverseFFT(fftData, incr);
+      infoFFT = amplitudePhase(fftData, incr);
+
+    }
+    else {
+      console.log("Erreur fftWorker.js/fftData null");
+    }
   }
-  else {
-    console.log("Erreur fftData null");
+  else{
+    console.log("Erreur fftWorker.js/traitementFFT data.length null");
   }
+
+  console.log(infoFFT);
 
   return {"info": infoFFT, "reverse":fftReverse}
 }
@@ -217,6 +239,7 @@ function signalDetection(data) {
   var frequency = 45056;
   var nbEltAnalyse = data.length;
 
+  // ajout min max amplitude sound ( moyenne de tout les sound ) + longeur moyenne detect signal
   for(var i = 0; i < nbEltAnalyse;i = i + 128) {
 
     if( (Math.abs(data[i]) > seuil) || register ) {
@@ -240,7 +263,6 @@ function signalDetection(data) {
       }
 
     }
-    console.log(cmpt);
 
     if ( (cmpt > MAXDATABRUIT) || (cmpt2 > MAXDATABRUIT) ) {
       var n = tmp.length;
@@ -252,7 +274,6 @@ function signalDetection(data) {
       register = false;
     }
   }
-  console.log(tmp.length);
 
   if ( tmp.length > 0 ) {
     var sub = tmp.slice(0,n-cmpt);

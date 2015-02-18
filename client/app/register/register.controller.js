@@ -48,17 +48,19 @@ angular.module('voiceVsYouApp')
 
     };
 
-    var drawFFT = function (data) {
+    var drawFFT = function (data,incr) {
 
-      $scope.fftAmplitude =  [{"key": "Amplitude","values":[]}];
-      $scope.fftPhase = [{"key": "Phase","values":[]}];
-      $scope.DataReconstruct = [{"key": "Reconstruct","values":[]}];
+      FftService.traitementFFT(data,incr).then(function(outputData) {
 
-      FftService.traitementFFT(data,128).then(function(outputData) {
+        $scope.fftAmplitude =  [{"key": "Amplitude","values":[]}];
+        $scope.fftPhase = [{"key": "Phase","values":[]}];
+
+        // $scope.DataReconstruct = [{"key": "Reconstruct","values":[]}];
+
         $scope.fftAmplitude[0]["values"] = outputData["info"]["amplitude"];
         $scope.fftPhase[0]["values"] = outputData["info"]["phase"];
 
-        $scope.DataReconstruct[0]["values"] = outputData["reverse"];
+       // $scope.DataReconstruct[0]["values"] = outputData["reverse"];
 
       });
     }
@@ -123,7 +125,7 @@ angular.module('voiceVsYouApp')
 
           if ( lengthDataPrec > MINSIZEANALYZE ) {
 
-            //drawFFT(dataS);
+            //drawFFT(dataS,128);
             indexStartData += lengthDataPrec;
             lengthDataPrec = 0;
           }
@@ -155,8 +157,10 @@ angular.module('voiceVsYouApp')
             $scope.DataReconstruct[i]["values"] = outputData[i];
           }
 
+          drawFFT(outputData[0],1);
+
           for(var k = 0;  k < sound[0].length;k = k + 128) {
-            $scope.Data[0]["values"].push([45960*k/sound[0].length,sound[0][k]]);
+            $scope.Data[0]["values"].push([k,sound[0][k]]);
           }
 
           $scope.jsAudio.stopRecording('downloadAndStream');
