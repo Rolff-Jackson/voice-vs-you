@@ -9,6 +9,7 @@ function extractDim(data,debut,fin,dim) {
 
   return res;
 }
+
 function traitementFFT(data,incr) {
 
   var N = data.length;
@@ -22,6 +23,8 @@ function traitementFFT(data,incr) {
     else {
       soundData = data.subarray(0,nbEltAnalyse);
     }
+
+    soundData = fenetreHamming(soundData);
 
     var fftData = fft(soundData,0);
 
@@ -50,6 +53,7 @@ function traitementFFT(data,incr) {
 self.addEventListener('message', function(e) {
   switch(e.data.command) {
     case 'traitementFFT':
+      console.log(self.name);
       self.postMessage(
         traitementFFT(e.data.data, e.data.incr)
       );
@@ -61,11 +65,11 @@ self.addEventListener('message', function(e) {
       );
       break;
     case 'cutSignal':
+      console.log(self.name);
       self.postMessage(
         signalDetection(e.data.data)
       );
       break;
-
   }
 
 }, false);
@@ -109,6 +113,85 @@ function phaseComplex(c) {
   var img = c["img"];
 
   return Math.atan2(img,real);
+}
+
+function echelleFreq_Mel(freq) {
+  var arg = 1 +freq/700;
+  var res = 2595 * Math.log(arg);
+  return res;
+}
+
+function echelleMel_Freq(freq) {
+  var arg = 1 +freq/700;
+  var res = 2595 * Math.log(arg);
+  return res;
+}
+
+function fenetreHamming(data) {
+  var res = [];
+  var T = data.length-1;
+
+  for(var k = 0; k <= T;k++) {
+    var t = data[k];
+    var tmp = 0.54 - 0.46 * Math.cos(2*Math.PI * t/T);
+    res.push(tmp*t);
+  }
+
+  return res;
+}
+
+function filtreTriangulaire(t,T) {
+  if ( t < T/2 ) {
+    return 2*t/T;
+  }
+  else {
+    return 2*(T-t)/T;
+  }
+}
+
+// fonction utilisée sur l'amplitude du signal FFT
+function filtreMel(data,nbFiltre) {
+  var N = data.length;
+  var T = echelleFreq_Mel(data[N-1][0])/nbFiltre;
+  var res = [];
+  for(var f = 0; f < nbFiltre;f++) {
+    res.push([f,0]);
+  }
+
+  for(var i= 0; i < N ;i++) {
+    var mel = echelleFreq_Mel(data[i][0]);
+    var filtre = 0;
+    for(var k = 0; k < nbFiltre;k++) {
+
+      if ( k%2 == 0 ) {
+        if ( mel <= (k+1)*T  && mel >= k*T ) {
+          res[k][1] += data[i][1]*filtreTriangulaire(mel,T*(k+1));
+          if ( filtre == 0 ) {
+            filtre = 1;
+          }
+        }
+      }
+      else {
+        if ( ( mel <= T*(k + 0.5))  && ( mel >= T*(k-0.5) ) ) {
+          res[k][1] += data[i][1]*filtreTriangulaire(mel,T*(k+0.5));
+          if ( filtre == 0 ) {
+            filtre = 1;
+          }
+        }
+      }
+
+      if ( filtre > 0 ) {
+        filtre++;
+      }
+      else if ( filtre == 3 ) {
+        break;
+      }
+
+    }
+  }
+
+  return res;
+
 }
 
 function splitTable(data,N) {
@@ -192,16 +275,19 @@ function amplitudePhase(dataC,incr) {
   if ( incr > 0 ) {
     for(var i = 0 ; i < N ;i = i + incr) {
       var elt = dataC[i];
+      var xFreq  = frequency*i/nbEltAnalyse;
 
-      module.push([frequency*i/nbEltAnalyse,moduleComplex(elt)]);
-      phase.push([frequency*i/nbEltAnalyse,phaseComplex(elt)]);
+      module.push([xFreq,moduleComplex(elt)]);
+      phase.push([xFreq,phaseComplex(elt)]);
     }
   }
   else {
     console.log("Incr must be a positif integer ");
   }
 
-  return {"amplitude":module,"phase":phase,"nbData": N};
+  var filtre = filtreMel(module,30);
+
+  return {"amplitude":filtre,"phase":phase,"nbData": N};
 }
 
 function inverseFFT(dataC,incr) {
@@ -235,16 +321,15 @@ function signalDetection(data) {
   var cmpt = 0;
   var cmpt2 = 0;
 
-  var MAXDATABRUIT = 50;
-  var frequency = 45056;
+  var MAXDATABRUIT = 50*128;
   var nbEltAnalyse = data.length;
 
   // ajout min max amplitude sound ( moyenne de tout les sound ) + longeur moyenne detect signal
-  for(var i = 0; i < nbEltAnalyse;i = i + 128) {
+  for(var i = 0; i < nbEltAnalyse;i++) {
 
     if( (Math.abs(data[i]) > seuil) || register ) {
 
-      tmp.push([frequency*i/nbEltAnalyse,data[i]]);
+      tmp.push([i,data[i]]);
       register = true;
       if ( Math.abs(data[i]) > seuil ) {
         cmpt = 0;
@@ -307,4 +392,6 @@ function testFFT() {
    console.log( inverseF);
 
 };
+
+
 

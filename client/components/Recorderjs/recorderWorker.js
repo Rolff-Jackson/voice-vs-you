@@ -20,6 +20,9 @@ this.onmessage = function(e){
     case 'getBufferSub':
       getBufferSub(e.data.config);
       break;
+    case 'getBufferSub2':
+      getBufferSub2(e.data.config);
+      break;
     case 'clear':
       clear();
       break;
@@ -69,7 +72,17 @@ function getBufferSub(config){
   var buffers = [];
 
   for (var channel = 0; channel < numChannels; channel++){
-    buffers.push(mergeBuffers(recBuffers[channel],config.info, recLength-config.info));
+    buffers.push(mergeBuffers(recBuffers[channel],config.info,(recLength-config.info)));
+  }
+  this.postMessage(buffers);
+}
+
+function getBufferSub2(config){
+  var buffers = [];
+  var tailleBuffer = config.buffer[0][0].length*config.buffer[0].length-config.info;
+
+  for (var channel = 0; channel < numChannels; channel++){
+    buffers.push(mergeBuffers(config.buffer[channel],config.info,tailleBuffer));
   }
   this.postMessage(buffers);
 }
@@ -98,6 +111,11 @@ function mergeBuffers(recBuffers, start, recLength){
     }
     else {
       offset += recBuffers[i].length;
+      if ( offset > start ) {
+        var sub = recBuffers[i].subarray(offset-start,recBuffers[i].length);
+        result.set(sub, offset2);
+        offset2 += sub.length;
+      }
     }
   }
   return result;

@@ -10,7 +10,10 @@
     this.node = (this.context.createScriptProcessor ||
                  this.context.createJavaScriptNode).call(this.context,
                  bufferLen, numChannels, numChannels);
+
     var worker = new Worker(config.workerPath || WORKER_PATH);
+   // var worker2 = new Worker(config.workerPath || WORKER_PATH);
+
     worker.postMessage({
       command: 'init',
       config: {
@@ -18,13 +21,28 @@
         numChannels: numChannels
       }
     });
+
     var recording = false,
       currCallback;
+
+    /*worker2.postMessage({
+      command: 'init',
+      config: {
+        sampleRate: this.context.sampleRate,
+        numChannels: numChannels
+      }
+    });
+
+    var bufferGlob = [];
+    for (var channel = 0; channel < numChannels; channel++){
+      bufferGlob[channel] = [];
+    }*/
 
     this.node.onaudioprocess = function(e){
       if (!recording) return;
       var buffer = [];
       for (var channel = 0; channel < numChannels; channel++){
+         // bufferGlob[channel].push(e.inputBuffer.getChannelData(channel));
           buffer.push(e.inputBuffer.getChannelData(channel));
       }
 
@@ -61,6 +79,7 @@
 
     this.getBufferSub = function(cb,indice) {
       currCallback = cb || config.callback;
+
       worker.postMessage(
         {
           command: 'getBufferSub',
@@ -69,6 +88,19 @@
           }
         });
     }
+
+    /*this.getBufferSub2 = function(cb,indice) {
+      currCallback = cb || config.callback;
+
+      worker2.postMessage(
+        {
+          command: 'getBufferSub2',
+          config: {
+            info: indice,
+            buffer: bufferGlob
+          }
+        });
+    }*/
 
     this.exportWAV = function(cb, type){
 
@@ -87,6 +119,12 @@
       var blob = e.data;
       currCallback(blob);
     }
+
+  /*  worker2.onmessage = function(e){
+      var blob = e.data;
+      currCallback(blob);
+      console.log(bufferGlob);
+    }*/
 
     source.connect(this.node);
     this.node.connect(this.context.destination);    //this should not be necessary

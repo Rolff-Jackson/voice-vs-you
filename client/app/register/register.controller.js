@@ -8,7 +8,7 @@ angular.module('voiceVsYouApp')
       'Karma'
     ];
 
-    $scope.Data = [{"key": "Sound","values":[[0,0],[1,0],[0,0],[1,0]]}];
+    $scope.Data = [{"key": "Sound","values":[]}];
     $scope.fftAmplitude = [{"key": "Amplitude","values":[]}];
     $scope.fftPhase = [{"key": "Phase","values":[]}];
     $scope.DataReconstruct = [{"key": "Reconstruct","values":[]}];
@@ -40,14 +40,6 @@ angular.module('voiceVsYouApp')
       }
     }
 
-    $scope.readData = function() {
-
-    };
-
-    $scope.stopRead = function() {
-
-    };
-
     var drawFFT = function (data,incr) {
 
       FftService.traitementFFT(data,incr).then(function(outputData) {
@@ -65,33 +57,17 @@ angular.module('voiceVsYouApp')
       });
     }
 
-    /***************************************************
-     Detect browser
-     ***************************************************/
-    if((window.chrome !== null) && (window.navigator.vendor === "Google Inc.")) {
-    } else {
-      alert('This application will only work on Google Chrome, Firefox and Opera!');
-    }
-    var jsAudioRecorder = new jsHtml5AudioRecorder();
-    /***************************************************
-     Init Html5 Audio Streaming
-     ***************************************************/
-
-    jsAudioRecorder.Recorder = Recorder; //External library that effectively record audio stream
-    jsAudioRecorder.mediaPath = '/'; //Path where to store audio files
-    jsAudioRecorder.audioExtension = 'wav'; //Only wav format is supported
-    jsAudioRecorder.audioTagId = 'myAudio';
-    jsAudioRecorder.showStreamOnFinish = false; //Show audio player on finish?
-    jsAudioRecorder.phpFile = 'bower_components/js-html5-audio-recorder/demo/form/audioProcess.php'; //Php file that will proceed to audio file
-    jsAudioRecorder.init();
-
-    $scope.jsAudio = jsAudioRecorder;
+    $scope.jsAudio = FftService.initRecorder();
     $scope.stop = undefined;
 
     $scope.startRecordingData = function() {
       var data = [];
 
       $scope.clearData();
+      console.log($scope.jsAudio);
+
+
+
       $scope.jsAudio.startRecording();
 
       var indexStartData = 0;
@@ -103,6 +79,7 @@ angular.module('voiceVsYouApp')
       // Don't start a new fight if we are already fighting/
 
       var dataS = [];
+
       $scope.stop = $interval(function() {
 
         // modification de la lib RecorderJs pour recuperer juste une portion du flux total
@@ -129,10 +106,14 @@ angular.module('voiceVsYouApp')
             indexStartData += lengthDataPrec;
             lengthDataPrec = 0;
           }
+          console.log(indexStartData);
 
         },indexStartData);
-
       }, 400);
+
+     // FftService.draw($scope.Data[0]["values"]);
+
+
     };
 
     /**
@@ -148,25 +129,33 @@ angular.module('voiceVsYouApp')
 
       $scope.jsAudio.Recorder.getBuffer(function(sound) {
 
+        console.log("nb data: " + sound[0].length);
+
         FftService.cutSignal(sound[0]).then(function (outputData) {
           $scope.DataReconstruct = [];
           $scope.Data[0]["values"] = [];
 
-          for (var i = 0; i < outputData.length; i++) {
+          // show cut signal
+          for (var i = 0; i < outputData.length; i++ ) {
             $scope.DataReconstruct.push({"key": "Sub Sound" + i, "values": []});
-            $scope.DataReconstruct[i]["values"] = outputData[i];
+            for(var k =0; k < outputData[i].length;k+=128) {
+              $scope.DataReconstruct[i]["values"].push(outputData[i][k]);
+            }
+
           }
+
+          console.log(outputData);
 
           drawFFT(outputData[0],1);
 
-          for(var k = 0;  k < sound[0].length;k = k + 128) {
+          //show all curve
+          for(var k = 0;  k < sound[0].length;k += 128) {
             $scope.Data[0]["values"].push([k,sound[0][k]]);
           }
 
           $scope.jsAudio.stopRecording('downloadAndStream');
         });
       });
-
     };
 
     $scope.saveData = function() {
