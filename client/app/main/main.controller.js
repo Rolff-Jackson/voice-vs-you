@@ -37,8 +37,7 @@ angular.module('voiceVsYouApp')
         $scope.audio.volume(1);
       }
     }
-
-
+    
     $scope.pause = function() {
       if ($scope.audio.playing) {
         $scope.audio.pause();
