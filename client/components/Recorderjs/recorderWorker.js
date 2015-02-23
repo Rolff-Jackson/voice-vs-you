@@ -15,7 +15,7 @@ this.onmessage = function(e){
       exportWAV(e.data.type);
       break;
     case 'exportDataWAV':
-      exportWAV(e.data.data,e.data.type);
+      exportDataWAV(e.data.data,e.data.type);
       break;
     case 'getBuffer':
       getBuffer();
@@ -65,12 +65,11 @@ function exportWAV(type){
 
 function exportDataWAV(data,type){
   var buffers = [];
-
   var channels = data.length;
 
   for (var channel = 0; channel < channels; channel++){
-    var dataLength = data.length;
-    buffers.push(mergeBuffers(data[channel],0, dataLength));
+    var dataLength = data[channel].length;
+    buffers.push(data[channel]);
   }
 
   if (channels === 2){

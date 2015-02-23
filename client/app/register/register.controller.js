@@ -41,23 +41,6 @@ angular.module('voiceVsYouApp')
       }
     }
 
-    var drawFFT = function (data,incr) {
-
-      FftService.traitementFFT(data,incr).then(function(outputData) {
-
-        $scope.fftAmplitude =  [{"key": "Amplitude","values":[]}];
-        $scope.fftPhase = [{"key": "Phase","values":[]}];
-
-        // $scope.DataReconstruct = [{"key": "Reconstruct","values":[]}];
-
-        $scope.fftAmplitude[0]["values"] = outputData["info"]["amplitude"];
-        $scope.fftPhase[0]["values"] = outputData["info"]["phase"];
-
-       // $scope.DataReconstruct[0]["values"] = outputData["reverse"];
-
-      });
-    };
-
     var drawMFCC = function (data) {
 
       FftService.algoMFCC(data).then(function(outputData) {
@@ -72,8 +55,6 @@ angular.module('voiceVsYouApp')
       });
     };
 
-
-
     $scope.jsAudio = FftService.initRecorder();
     $scope.stop = undefined;
 
@@ -81,10 +62,6 @@ angular.module('voiceVsYouApp')
       var data = [];
 
       $scope.clearData();
-      console.log($scope.jsAudio);
-
-
-
       $scope.jsAudio.startRecording();
 
       var indexStartData = 0;
@@ -119,11 +96,9 @@ angular.module('voiceVsYouApp')
 
           if ( lengthDataPrec > MINSIZEANALYZE ) {
 
-            //drawFFT(dataS,128);
             indexStartData += lengthDataPrec;
             lengthDataPrec = 0;
           }
-          console.log(indexStartData);
 
         },indexStartData);
       }, 400);
@@ -145,32 +120,49 @@ angular.module('voiceVsYouApp')
       }
 
       $scope.jsAudio.Recorder.getBuffer(function(sound) {
+        $scope.jsAudio.Recorder.stop();
 
-        $scope.jsAudio.Recorder.exporDataWAV(function(blop) {
-          FftService.download(blop,$scope.jsAudio.Recorder);
-        },sound);
+        FftService.filtreFreq(sound[0],300,3400).then(function(output) {
+          var res = [];
+          res.push(output);
+          res.push(output);
 
-        console.log("nb data: " + sound[0].length);
+          $scope.jsAudio.Recorder.exporDataWAV(function(blop) {
+            FftService.download(blop);
 
-        FftService.cutSignal(sound[0]).then(function (outputData) {
-          $scope.DataReconstruct = [];
-          $scope.Data[0]["values"] = [];
+            $scope.jsAudio.Recorder.exporDataWAV(function(blop) {
+              FftService.download(blop);
+            },sound);
 
-          // show cut signal
-          for (var i = 0; i < outputData.length; i++ ) {
-            $scope.DataReconstruct.push({"key": "Sub Sound" + i, "values": []});
-            for(var k =0; k < outputData[i].length;k+=128) {
-              $scope.DataReconstruct[i]["values"].push(outputData[i][k]);
+          },res);
+
+          console.log("nb data: " + output.length);
+
+          var signal = output; //sound[0]
+
+          FftService.cutSignal(signal).then(function (outputData) {
+            $scope.DataReconstruct = [];
+            $scope.Data[0]["values"] = [];
+
+            // show cut signal
+            for (var i = 0; i < outputData.length; i++ ) {
+              $scope.DataReconstruct.push({"key": "Sub Sound" + i, "values": []});
+              for(var k =0; k < outputData[i].length;k+=128) {
+                $scope.DataReconstruct[i]["values"].push(outputData[i][k]);
+              }
             }
-          }
 
-          console.log(outputData);
-          drawMFCC(outputData[0]);
+            console.log(outputData[0]);
+            drawMFCC(outputData[0]);
 
-          //show all curve
-          for(var k = 0;  k < sound[0].length;k += 128) {
-            $scope.Data[0]["values"].push([k,sound[0][k]]);
-          }
+            //show all curve
+            for(var k = 0;  k < sound[0].length;k += 128) {
+              $scope.Data[0]["values"].push([k,sound[0][k]]);
+            }
+
+          });
+
+
 
           //$scope.jsAudio.stopRecording('saveAndDownload');
         });

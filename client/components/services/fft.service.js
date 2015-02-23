@@ -4,24 +4,13 @@ angular.module('voiceVsYouApp')
   .factory('FftService', function ($q,$interval) {
 
     var worker = new Worker('components/workers/fftWorker.js');
-    var worker2 = new Worker('components/workers/worker.js');
-    var worker3 = new Worker('components/workers/worker.js');
-    var defer,defer2,defer3;
+
+    var defer;
     var jsAudioRecorder;
 
     worker.addEventListener('message', function(e) {
       // traitements additionnels ...
       defer.resolve(e.data);
-    }, false);
-
-    worker2.addEventListener('message', function(e) {
-      // traitements additionnels ...
-      defer2.resolve(e.data);
-    }, false);
-
-    worker3.addEventListener('message', function(e) {
-      // traitements additionnels ...
-      defer3.resolve(e.data);
     }, false);
 
     return {
@@ -47,33 +36,6 @@ angular.module('voiceVsYouApp')
       initRecorder : function() {
         return initRecorder();
       },
-      test1: function() {
-        defer2 = $q.defer();
-
-        worker2.postMessage({
-          'command':"test1"
-        });
-        return defer2.promise;
-      },
-      test2: function() {
-        defer3 = $q.defer();
-
-        worker3.postMessage({
-          'command':"test2"
-        });
-        return defer3.promise;
-      },
-      drawData: function(dataDraw,dataMicro,indices) {
-        defer2 = $q.defer();
-
-        worker2.postMessage({
-          'command':"drawData",
-          'dataDraw' : dataDraw,
-          'dataMicro' : dataMicro,
-          'indices' : indices
-        });
-        return defer2.promise;
-      },
       algoMFCC: function(dataMicro) {
         defer = $q.defer();
 
@@ -85,6 +47,17 @@ angular.module('voiceVsYouApp')
       },
       download: function(blop) {
         download(blop);
+      },
+      filtreFreq: function(dataMicro,freqB,freqH) {
+        defer = $q.defer();
+
+        worker.postMessage({
+          'command':"filtreFreq",
+          'dataMicro' : dataMicro,
+          'freqB': freqB,
+          'freqH': freqH
+        });
+        return defer.promise;
       }
 
     };

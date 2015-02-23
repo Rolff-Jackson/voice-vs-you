@@ -88,7 +88,7 @@
       });
     }
 
-    this.exporDataWAV = function(cb, data,type){
+    this.exporDataWAV = function(cb, data, type){
 
       currCallback = cb || config.callback;
       type = type || config.type || 'audio/wav';

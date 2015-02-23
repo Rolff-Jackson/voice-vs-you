@@ -62,6 +62,58 @@ function cutFenetrageHamming(data,lengthF,incrF) {
   return res;
 }
 
+function normalizeMFCC(data) {
+  var N = data.length;
+  var res = [];
+  var moy = 0;
+  var variance = 0;
+  console.log(data);
+  if ( N > 0 ) {
+
+    for(var k=1; k < (N/2) + 1;k++) {
+
+      if ( data[k].length > 1 ) {
+        var tmp = data[k][1];
+        moy += tmp;
+        variance += (tmp * tmp);
+      }
+      else {
+        moy+= data[k];
+        variance += (data[k] * data[k]);
+      }
+
+    }
+    console.log("start");
+    console.log("moy: " + moy + "\nvariance: " + variance);
+
+    variance /= (N/2);
+    moy /= (N/2);
+    variance = (variance - (moy*moy) );
+
+    console.log("moy: " + moy + "\nvariance: " + variance);
+    console.log("end");
+
+    for(var k=1; k < (N/2) + 1;k++) {
+
+      if ( data[k].length > 1 ) {
+        var tmp = (data[k][1]-moy) / variance;
+        res.push([data[k][0],tmp]);
+      }
+      else {
+        res.push((data[k]-moy)/variance);
+      }
+
+    }
+  }
+  else {
+    console.log("Data Normalize is null");
+  }
+
+
+  return res;
+}
+
+// à rajouter banc de Mel seulement entre 400 et 3400 Hertz
 function algoMFCC(data) {
 
   var N = data.length;
@@ -96,7 +148,8 @@ function algoMFCC(data) {
         tmp = algoDCT(tmp);
 
         //sauvegarde des coefficients cepstraux
-        filtre.push(tmp);
+        var normalize = normalizeMFCC(tmp);
+        filtre.push(normalize);
       }
       else {
         console.log("Erreur fftWorker.js/fftData null");
@@ -107,6 +160,36 @@ function algoMFCC(data) {
     console.log("Erreur fftWorker.js/algoMFCC data.length null");
   }
   return filtre;
+}
+
+
+function filtreFreq(data,start,end) {
+  var N = data.length;
+  var nbEltAnalyse = Math.pow(2,Math.floor(Math.log(N)/Math.log(2)));
+  var soundData = data.subarray(0,nbEltAnalyse);
+
+  var fftData = fft(soundData,0);
+
+  var frequencyH = Math.floor(start * (N/45960) ) + 1;
+  var frequencyB = Math.floor(end * (N/45960) );
+
+  for(var k = 0 ; k < frequencyB;k++ ) {
+    fftData[k] = complexOf(0,0);
+    fftData[nbEltAnalyse-k-1] = complexOf(0,0);
+  }
+
+  for(var k = frequencyH; k < nbEltAnalyse-frequencyH;k++ ) {
+    fftData[k] = complexOf(0,0);
+  }
+
+  var res = fft(fftData,1);
+  var arrayRes = new Float32Array(nbEltAnalyse);
+
+  for(var k = 0; k < nbEltAnalyse;k++) {
+    arrayRes[k] = res[k]["real"]/nbEltAnalyse;
+  }
+
+  return arrayRes;
 }
 
 function traitementFFT(data,incr) {
@@ -149,7 +232,6 @@ function traitementFFT(data,incr) {
 self.addEventListener('message', function(e) {
   switch(e.data.command) {
     case 'traitementFFT':
-      console.log(self.name);
       self.postMessage(
         traitementFFT(e.data.data, e.data.incr)
       );
@@ -160,15 +242,18 @@ self.addEventListener('message', function(e) {
       );
       break;
     case 'cutSignal':
-      console.log(self.name);
       self.postMessage(
         signalDetection(e.data.data)
       );
       break;
     case 'algoMFCC':
-      console.log(self.name);
       self.postMessage(
         algoMFCC(e.data.dataMicro)
+      );
+      break;
+    case 'filtreFreq':
+      self.postMessage(
+        filtreFreq(e.data.dataMicro, e.data.freqB, e.data.freqH)
       );
       break;
   }
@@ -421,6 +506,7 @@ function inverseFFT(dataC,incr) {
   return inversefft;
 }
 
+// ) refaire decoupe signal
 function signalDetection(data) {
   var seuil = 0.05;
   var seuilB = 0.02;
