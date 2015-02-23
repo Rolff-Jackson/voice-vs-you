@@ -12,7 +12,6 @@
                  bufferLen, numChannels, numChannels);
 
     var worker = new Worker(config.workerPath || WORKER_PATH);
-   // var worker2 = new Worker(config.workerPath || WORKER_PATH);
 
     worker.postMessage({
       command: 'init',
@@ -24,19 +23,6 @@
 
     var recording = false,
       currCallback;
-
-    /*worker2.postMessage({
-      command: 'init',
-      config: {
-        sampleRate: this.context.sampleRate,
-        numChannels: numChannels
-      }
-    });
-
-    var bufferGlob = [];
-    for (var channel = 0; channel < numChannels; channel++){
-      bufferGlob[channel] = [];
-    }*/
 
     this.node.onaudioprocess = function(e){
       if (!recording) return;
@@ -89,19 +75,6 @@
         });
     }
 
-    /*this.getBufferSub2 = function(cb,indice) {
-      currCallback = cb || config.callback;
-
-      worker2.postMessage(
-        {
-          command: 'getBufferSub2',
-          config: {
-            info: indice,
-            buffer: bufferGlob
-          }
-        });
-    }*/
-
     this.exportWAV = function(cb, type){
 
       currCallback = cb || config.callback;
@@ -115,16 +88,24 @@
       });
     }
 
+    this.exporDataWAV = function(cb, data,type){
+
+      currCallback = cb || config.callback;
+      type = type || config.type || 'audio/wav';
+
+      if (!currCallback) throw new Error('Callback not set');
+
+      worker.postMessage({
+        command: 'exportDataWAV',
+        type: type,
+        data: data
+      });
+    }
+
     worker.onmessage = function(e){
       var blob = e.data;
       currCallback(blob);
     }
-
-  /*  worker2.onmessage = function(e){
-      var blob = e.data;
-      currCallback(blob);
-      console.log(bufferGlob);
-    }*/
 
     source.connect(this.node);
     this.node.connect(this.context.destination);    //this should not be necessary

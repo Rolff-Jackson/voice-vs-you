@@ -14,6 +14,9 @@ this.onmessage = function(e){
     case 'exportWAV':
       exportWAV(e.data.type);
       break;
+    case 'exportDataWAV':
+      exportWAV(e.data.data,e.data.type);
+      break;
     case 'getBuffer':
       getBuffer();
       break;
@@ -53,6 +56,27 @@ function exportWAV(type){
       var interleaved = interleave(buffers[0], buffers[1]);
   } else {
       var interleaved = buffers[0];
+  }
+  var dataview = encodeWAV(interleaved);
+  var audioBlob = new Blob([dataview], { type: type });
+
+  this.postMessage(audioBlob);
+}
+
+function exportDataWAV(data,type){
+  var buffers = [];
+
+  var channels = data.length;
+
+  for (var channel = 0; channel < channels; channel++){
+    var dataLength = data.length;
+    buffers.push(mergeBuffers(data[channel],0, dataLength));
+  }
+
+  if (channels === 2){
+    var interleaved = interleave(buffers[0], buffers[1]);
+  } else {
+    var interleaved = buffers[0];
   }
   var dataview = encodeWAV(interleaved);
   var audioBlob = new Blob([dataview], { type: type });

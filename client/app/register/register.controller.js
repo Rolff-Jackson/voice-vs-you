@@ -146,6 +146,10 @@ angular.module('voiceVsYouApp')
 
       $scope.jsAudio.Recorder.getBuffer(function(sound) {
 
+        $scope.jsAudio.Recorder.exporDataWAV(function(blop) {
+          FftService.download(blop,$scope.jsAudio.Recorder);
+        },sound);
+
         console.log("nb data: " + sound[0].length);
 
         FftService.cutSignal(sound[0]).then(function (outputData) {
@@ -158,7 +162,6 @@ angular.module('voiceVsYouApp')
             for(var k =0; k < outputData[i].length;k+=128) {
               $scope.DataReconstruct[i]["values"].push(outputData[i][k]);
             }
-
           }
 
           console.log(outputData);
@@ -169,7 +172,7 @@ angular.module('voiceVsYouApp')
             $scope.Data[0]["values"].push([k,sound[0][k]]);
           }
 
-          $scope.jsAudio.stopRecording('downloadAndStream');
+          //$scope.jsAudio.stopRecording('saveAndDownload');
         });
       });
     };
