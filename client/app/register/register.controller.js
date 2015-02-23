@@ -57,13 +57,18 @@ angular.module('voiceVsYouApp')
 
       });
     };
+
     var drawMFCC = function (data) {
 
       FftService.algoMFCC(data).then(function(outputData) {
 
-        $scope.MFCC =  [{"key": "MFCC","values":[]}];
-        $scope.MFCC[0]["values"] = outputData;
-        console.log(outputData);
+        $scope.MFCC = [];
+        console.log(outputData.length)
+        for(var k=0; k< outputData.length;k++) {
+          $scope.MFCC.push({"key": "MFCC num" + k,"values":[]});
+          $scope.MFCC[k]["values"] = outputData[k].slice(1,outputData[k].length/2+1);
+        }
+
       });
     };
 

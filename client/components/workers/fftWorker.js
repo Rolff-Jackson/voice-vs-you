@@ -33,6 +33,34 @@ function algoDCT(data) {
 }
 
 // faire fenetrage hamming passe data et renvoie un tableau de fenetre !
+/**
+ *
+ * @param data
+ * @param lengthF
+ * @param incrF
+ * @returns {Array}
+ * lengthF is length of one window and incrF is increment between two window
+ */
+function cutFenetrageHamming(data,lengthF,incrF) {
+  // length must be two pow
+  var res = [];
+  var N = data.length;
+  var ratio = (N-lengthF)/incrF;
+  var nbFenetre = Math.floor(ratio);
+
+  for(var k = 0; k < nbFenetre;k++) {
+
+    var soundData = [];
+    if (data[0].length > 1) {
+      soundData = extractDim(data, k*incrF, k * incrF +  lengthF, 1);
+    }
+    else {
+      soundData = data.subarray( k*incrF, k * incrF +  lengthF);
+    }
+    res.push(soundData);
+  }
+  return res;
+}
 
 function algoMFCC(data) {
 
@@ -41,30 +69,39 @@ function algoMFCC(data) {
   var filtre = [];
 
   if ( N > 0 ) {
-    var soundData = [];
-    if (data[0].length > 1) {
-      soundData = extractDim(data, 0, nbEltAnalyse, 1);
-    }
-    else {
-      soundData = data.subarray(0, nbEltAnalyse);
-    }
 
-    soundData = fenetreHamming(soundData);
-    console.log(soundData);
-    var fftData = fft(soundData, 0);
-    var infoFFT = [];
+    var cutHamming = cutFenetrageHamming(data,4096,450);
+    var NbHamming = cutHamming.length;
 
-    if (fftData != null) {
-      infoFFT = amplitudePhase(fftData, 1);
+    for(var k = 0;k < NbHamming ;k++) {
+      var soundData = [];
+      var tmp = [];
+      soundData = fenetreHamming(cutHamming[k]);
 
-      filtre = filtreMel( infoFFT["amplitude"],32);
-      filtre = logData(filtre);
-      filtre = algoDCT(filtre);
+      // calcul FFT
+      var fftData = fft(soundData, 0);
+      var infoFFT = [];
+
+      if (fftData != null) {
+        // calcul amplitude FFT
+        infoFFT = amplitudePhase(fftData, 1);
+
+        //cacul energie dans le banc de 32 filtre triangulaire echelle de Mel
+        tmp = filtreMel(infoFFT["amplitude"],32);
+
+        // calcul du log des energies
+        tmp = logData(tmp);
+
+        // algo DCT
+        tmp = algoDCT(tmp);
+
+        //sauvegarde des coefficients cepstraux
+        filtre.push(tmp);
+      }
+      else {
+        console.log("Erreur fftWorker.js/fftData null");
+      }
     }
-    else {
-      console.log("Erreur fftWorker.js/fftData null");
-    }
-
   }
   else {
     console.log("Erreur fftWorker.js/algoMFCC data.length null");

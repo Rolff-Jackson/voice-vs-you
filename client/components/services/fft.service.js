@@ -104,7 +104,7 @@ angular.module('voiceVsYouApp')
       jsAudioRecorder.audioExtension = 'wav'; //Only wav format is supported
       jsAudioRecorder.audioTagId = 'myAudio';
       jsAudioRecorder.showStreamOnFinish = false; //Show audio player on finish?
-      jsAudioRecorder.phpFile = 'url to post data'; //Php file that will proceed to audio file
+      jsAudioRecorder.phpFile = ''; //Php file that will proceed to audio file
       jsAudioRecorder.init();
 
       return jsAudioRecorder;
