@@ -12,6 +12,7 @@ angular.module('voiceVsYouApp')
     $scope.fftAmplitude = [{"key": "Amplitude","values":[]}];
     $scope.fftPhase = [{"key": "Phase","values":[]}];
     $scope.DataReconstruct = [{"key": "Reconstruct","values":[]}];
+    $scope.MFCC =  [{"key": "MFCC","values":[]}];
 
     var truncate = function(val,num) {
       var coeffMult = Math.pow(10,num);
@@ -55,7 +56,18 @@ angular.module('voiceVsYouApp')
        // $scope.DataReconstruct[0]["values"] = outputData["reverse"];
 
       });
-    }
+    };
+    var drawMFCC = function (data) {
+
+      FftService.algoMFCC(data).then(function(outputData) {
+
+        $scope.MFCC =  [{"key": "MFCC","values":[]}];
+        $scope.MFCC[0]["values"] = outputData;
+        console.log(outputData);
+      });
+    };
+
+
 
     $scope.jsAudio = FftService.initRecorder();
     $scope.stop = undefined;
@@ -145,8 +157,7 @@ angular.module('voiceVsYouApp')
           }
 
           console.log(outputData);
-
-          drawFFT(outputData[0],1);
+          drawMFCC(outputData[0]);
 
           //show all curve
           for(var k = 0;  k < sound[0].length;k += 128) {

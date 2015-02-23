@@ -73,7 +73,17 @@ angular.module('voiceVsYouApp')
           'indices' : indices
         });
         return defer2.promise;
+      },
+      algoMFCC: function(dataMicro) {
+        defer = $q.defer();
+
+        worker.postMessage({
+          'command':"algoMFCC",
+          'dataMicro' : dataMicro
+        });
+        return defer.promise;
       }
+
     };
 
     function initRecorder() {

@@ -33,12 +33,49 @@
         tooltips="true">
         <svg></svg>
       </nvd3-line-with-focus-chart>
+      <!--
+            <h1>FFT</h1>
+            <h4>Amplitude</h4>
+            <nvd3-multi-bar-chart
+              data="fftAmplitude"
+              id="FFT_Amplitude"
+              xAxisTickFormat="xAxisTickFormat()"
+              yAxisTickFormat="yAxisTickFormatFunction()"
 
-      <h1>FFT</h1>
-      <h4>Amplitude</h4>
+              reduceXTicks="true"
+              tooltips="true"
+
+              width="1000"
+              height="500"
+              showXAxis="true"
+              showYAxis="true">
+              <svg></svg>
+            </nvd3-multi-bar-chart>
+
+            <h1>FFT</h1>
+            <h4>Phase</h4>
+            <nvd3-multi-bar-chart
+              data="fftPhase"
+              id="FFT_Phase"
+              xAxisTickFormat="xAxisTickFormat()"
+              yAxisTickFormat="yAxisTickFormatFunction()"
+
+              reduceXTicks="true"
+              tooltips="true"
+
+              width="1000"
+              height="500"
+              showXAxis="true"
+              showYAxis="true">
+              <svg></svg>
+            </nvd3-multi-bar-chart>
+      -->
+
+      <h1>MFCC</h1>
+      <h4>Coeff</h4>
       <nvd3-multi-bar-chart
-        data="fftAmplitude"
-        id="FFT_Amplitude"
+        data="MFCC"
+        id="MFCC_coeff"
         xAxisTickFormat="xAxisTickFormat()"
         yAxisTickFormat="yAxisTickFormatFunction()"
 
@@ -51,25 +88,7 @@
         showYAxis="true">
         <svg></svg>
       </nvd3-multi-bar-chart>
-<!--
-      <h1>FFT</h1>
-      <h4>Phase</h4>
-      <nvd3-multi-bar-chart
-        data="fftPhase"
-        id="FFT_Phase"
-        xAxisTickFormat="xAxisTickFormat()"
-        yAxisTickFormat="yAxisTickFormatFunction()"
 
-        reduceXTicks="true"
-        tooltips="true"
-
-        width="1000"
-        height="500"
-        showXAxis="true"
-        showYAxis="true">
-        <svg></svg>
-      </nvd3-multi-bar-chart>
--->
       <h1>Sound Reconstruct</h1>
       <nvd3-line-with-focus-chart
         data="DataReconstruct"

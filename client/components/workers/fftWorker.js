@@ -10,6 +10,68 @@ function extractDim(data,debut,fin,dim) {
   return res;
 }
 
+
+function algoDCT(data) {
+  var N = data.length;
+  var y = new Array(N);
+
+  for(var i = 0; i < (N/2);i++) {
+    y[i] = data[2*i];
+    y[N-i-1] = data[2*i+1];
+  }
+
+  var fftY = fft(y,0);
+  var res = [];
+  for(var i = 0; i < N;i++) {
+    // expComplex = exp(-2*i*PI*arg)
+    // on veut exp(-i*PI*n/2*N)
+    var tmp = multComplex(fftY[i],expComplex(i/4*N));
+    res.push([i,tmp["real"]]);
+  }
+
+  return res;
+}
+
+// faire fenetrage hamming passe data et renvoie un tableau de fenetre !
+
+function algoMFCC(data) {
+
+  var N = data.length;
+  var nbEltAnalyse = Math.pow(2,Math.floor(Math.log(N)/Math.log(2)));
+  var filtre = [];
+
+  if ( N > 0 ) {
+    var soundData = [];
+    if (data[0].length > 1) {
+      soundData = extractDim(data, 0, nbEltAnalyse, 1);
+    }
+    else {
+      soundData = data.subarray(0, nbEltAnalyse);
+    }
+
+    soundData = fenetreHamming(soundData);
+    console.log(soundData);
+    var fftData = fft(soundData, 0);
+    var infoFFT = [];
+
+    if (fftData != null) {
+      infoFFT = amplitudePhase(fftData, 1);
+
+      filtre = filtreMel( infoFFT["amplitude"],32);
+      filtre = logData(filtre);
+      filtre = algoDCT(filtre);
+    }
+    else {
+      console.log("Erreur fftWorker.js/fftData null");
+    }
+
+  }
+  else {
+    console.log("Erreur fftWorker.js/algoMFCC data.length null");
+  }
+  return filtre;
+}
+
 function traitementFFT(data,incr) {
 
   var N = data.length;
@@ -18,13 +80,10 @@ function traitementFFT(data,incr) {
     var soundData = [];
     if ( data[0].length > 1 ) {
       soundData = extractDim(data,0,nbEltAnalyse,1);
-      console.log(soundData);
     }
     else {
       soundData = data.subarray(0,nbEltAnalyse);
     }
-
-    soundData = fenetreHamming(soundData);
 
     var fftData = fft(soundData,0);
 
@@ -58,7 +117,6 @@ self.addEventListener('message', function(e) {
         traitementFFT(e.data.data, e.data.incr)
       );
       break;
-
     case 'testFFT':
       self.postMessage(
         testFFT()
@@ -68,6 +126,12 @@ self.addEventListener('message', function(e) {
       console.log(self.name);
       self.postMessage(
         signalDetection(e.data.data)
+      );
+      break;
+    case 'algoMFCC':
+      console.log(self.name);
+      self.postMessage(
+        algoMFCC(e.data.dataMicro)
       );
       break;
   }
@@ -150,10 +214,12 @@ function filtreTriangulaire(t,T) {
 }
 
 // fonction utilisée sur l'amplitude du signal FFT
+
 function filtreMel(data,nbFiltre) {
   var N = data.length;
   var T = echelleFreq_Mel(data[N-1][0])/nbFiltre;
   var res = [];
+
   for(var f = 0; f < nbFiltre;f++) {
     res.push([f,0]);
   }
@@ -161,11 +227,13 @@ function filtreMel(data,nbFiltre) {
   for(var i= 0; i < N ;i++) {
     var mel = echelleFreq_Mel(data[i][0]);
     var filtre = 0;
+
     for(var k = 0; k < nbFiltre;k++) {
 
       if ( k%2 == 0 ) {
         if ( mel <= (k+1)*T  && mel >= k*T ) {
-          res[k][1] += data[i][1]*filtreTriangulaire(mel,T*(k+1));
+          var energie = data[i][1]*filtreTriangulaire(mel,T*(k+1));
+          res[k][1] += energie*energie;
           if ( filtre == 0 ) {
             filtre = 1;
           }
@@ -173,7 +241,8 @@ function filtreMel(data,nbFiltre) {
       }
       else {
         if ( ( mel <= T*(k + 0.5))  && ( mel >= T*(k-0.5) ) ) {
-          res[k][1] += data[i][1]*filtreTriangulaire(mel,T*(k+0.5));
+          var energie = data[i][1]*filtreTriangulaire(mel,T*(k+0.5));
+          res[k][1] += energie*energie;
           if ( filtre == 0 ) {
             filtre = 1;
           }
@@ -191,7 +260,13 @@ function filtreMel(data,nbFiltre) {
   }
 
   return res;
+}
 
+function logData(data) {
+  for(var i = 0; i < data.length;i++) {
+    data[i] = Math.log(data[i][1]);
+  }
+  return data;
 }
 
 function splitTable(data,N) {
@@ -285,9 +360,7 @@ function amplitudePhase(dataC,incr) {
     console.log("Incr must be a positif integer ");
   }
 
-  var filtre = filtreMel(module,30);
-
-  return {"amplitude":filtre,"phase":phase,"nbData": N};
+  return {"amplitude":module,"phase":phase,"nbData": N};
 }
 
 function inverseFFT(dataC,incr) {
