@@ -64,5 +64,4 @@ angular.module('voiceVsYouApp')
 
     $scope.audio = initAudio();
 
-
   });

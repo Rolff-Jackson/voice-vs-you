@@ -10,7 +10,6 @@ function extractDim(data,debut,fin,dim) {
   return res;
 }
 
-
 function algoDCT(data) {
   var N = data.length;
   var y = new Array(N);
@@ -26,7 +25,7 @@ function algoDCT(data) {
     // expComplex = exp(-2*i*PI*arg)
     // on veut exp(-i*PI*n/2*N)
     var tmp = multComplex(fftY[i],expComplex(i/4*N));
-    res.push([i,tmp["real"]]);
+    res.push([i,moduleComplex(tmp)]);
   }
 
   return res;
@@ -149,7 +148,7 @@ function algoMFCC(data) {
 
         //sauvegarde des coefficients cepstraux
         var normalize = normalizeMFCC(tmp);
-        filtre.push(normalize);
+        filtre.push(tmp);
       }
       else {
         console.log("Erreur fftWorker.js/fftData null");
@@ -170,8 +169,8 @@ function filtreFreq(data,start,end) {
 
   var fftData = fft(soundData,0);
 
-  var frequencyH = Math.floor(start * (N/45960) ) + 1;
-  var frequencyB = Math.floor(end * (N/45960) );
+  var frequencyB = Math.floor(start * (N/45960) );
+  var frequencyH = Math.floor(end * (N/45960) ) + 1;
 
   for(var k = 0 ; k < frequencyB;k++ ) {
     fftData[k] = complexOf(0,0);
@@ -181,6 +180,8 @@ function filtreFreq(data,start,end) {
   for(var k = frequencyH; k < nbEltAnalyse-frequencyH;k++ ) {
     fftData[k] = complexOf(0,0);
   }
+
+  console.log(fftData);
 
   var res = fft(fftData,1);
   var arrayRes = new Float32Array(nbEltAnalyse);

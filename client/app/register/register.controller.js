@@ -52,6 +52,8 @@ angular.module('voiceVsYouApp')
           $scope.MFCC[k]["values"] = outputData[k].slice(1,outputData[k].length/2+1);
         }
 
+        drawTable();
+
       });
     };
 
@@ -112,6 +114,7 @@ angular.module('voiceVsYouApp')
      * You can use "save", "saveAndDownload" or "saveAndStream", "downloadAndStream" parameters
      */
 
+
     $scope.stopRecordingData = function() {
 
       if (angular.isDefined($scope.stop)) {
@@ -127,6 +130,8 @@ angular.module('voiceVsYouApp')
           res.push(output);
           res.push(output);
 
+          console.log(output);
+
           $scope.jsAudio.Recorder.exporDataWAV(function(blop) {
             FftService.download(blop);
 
@@ -141,6 +146,7 @@ angular.module('voiceVsYouApp')
           var signal = output; //sound[0]
 
           FftService.cutSignal(signal).then(function (outputData) {
+            console.log(outputData.length);
             $scope.DataReconstruct = [];
             $scope.Data[0]["values"] = [];
 
@@ -152,8 +158,9 @@ angular.module('voiceVsYouApp')
               }
             }
 
-            console.log(outputData[0]);
-            drawMFCC(outputData[0]);
+            for(var k=0; k < outputData.length;k++) {
+              drawMFCC(outputData[k]);
+            }
 
             //show all curve
             for(var k = 0;  k < sound[0].length;k += 128) {
@@ -161,9 +168,6 @@ angular.module('voiceVsYouApp')
             }
 
           });
-
-
-
           //$scope.jsAudio.stopRecording('saveAndDownload');
         });
       });
@@ -179,5 +183,39 @@ angular.module('voiceVsYouApp')
       $scope.fftPhase = [{"key": "Phase","values":[]}];
       $scope.DataReconstruct = [{"key": "Reconstruct","values":[]}];
     };
+
+    function rgbToHex(r, g, b) {
+      return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+
+    function drawTable() {
+      var colors = [];
+      var N = $scope.MFCC[0]["values"].length;
+
+      var max = $scope.MFCC[0]["values"][0][1];
+      var min = $scope.MFCC[0]["values"][0][1];
+
+      for(var l = 0; l < N;l++) {
+        colors.push([]);
+        for(var k = 0; k < $scope.MFCC.length;k++) {
+          var coeffs = $scope.MFCC[k]["values"];
+          if ( coeffs[l][1] > max ) { max = coeffs[l][1]};
+          if ( coeffs[l][1] < min ) { min = coeffs[l][1]};
+          colors[l].push([]);
+        }
+      }
+
+      for(var k =0; k < $scope.MFCC.length;k++) {
+        var coeffs = $scope.MFCC[k]["values"];
+
+        for(var l =0; l < coeffs.length;l++) {
+          var color = Math.floor(255 * ( coeffs[l][1] - min )/(max-min));
+          var hexColor = rgbToHex(color,0,0);
+          colors[l][k]={color:hexColor};
+        }
+      }
+
+      $scope.colors = colors;
+    }
 
   }]);

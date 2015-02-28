@@ -33,6 +33,12 @@
         tooltips="true">
         <svg></svg>
       </nvd3-line-with-focus-chart>
+
+      <table>
+        <tr ng-repeat="case in colors" height="20px">
+          <td ng-repeat="elt in case" bgcolor="{{elt.color}}" width="20px"> </td>
+        </tr>
+      </table>
       <!--
             <h1>FFT</h1>
             <h4>Amplitude</h4>
