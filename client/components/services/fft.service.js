@@ -53,9 +53,4 @@ angular.module('voiceVsYouApp')
         return defer.promise;
       }
     };
-
-
-
-
-
   });

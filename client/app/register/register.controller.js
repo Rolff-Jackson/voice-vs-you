@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('voiceVsYouApp')
-  .controller('RegisterCtrl', ['$scope','$interval','FftService','DrawService','MicrophoneService',function ($scope,$interval, FftService,DrawService,MicrophoneService) {
+  .controller('RegisterCtrl', ['$scope','$interval','MicrophoneService',function ($scope,$interval,MicrophoneService) {
 
     $scope.Data = [{"key": "Sound","values":[]}];
     $scope.DataReconstruct = [{"key": "Reconstruct","values":[]}];

@@ -1,6 +1,34 @@
 /**
  * Created by mazurkiewicz on 11/02/15.
  */
+
+self.addEventListener('message', function(e) {
+  switch(e.data.command) {
+    case 'traitementFFT':
+      self.postMessage(
+        traitementFFT(e.data.data, e.data.incr)
+      );
+      break;
+    case 'cutSignal':
+      self.postMessage(
+        signalDetection(e.data.data)
+      );
+      break;
+    case 'algoMFCC':
+      self.postMessage(
+        algoMFCC(e.data.dataMicro)
+      );
+      break;
+    case 'filtreFreq':
+      self.postMessage(
+        filtreFreq(e.data.dataMicro, e.data.freqB, e.data.freqH)
+      );
+      break;
+  }
+
+}, false);
+
+
 function extractDim(data,debut,fin,dim) {
   var res = [];
   for(var k=debut; k < fin;k++) {
@@ -69,7 +97,7 @@ function normalizeMFCC(data) {
   var res = [];
   var moy = 0;
   var variance = 0;
-  console.log(data);
+
   if ( N > 0 ) {
 
     for(var k=1; k < (N/2) + 1;k++) {
@@ -119,13 +147,15 @@ function normalizeMFCC(data) {
 function algoMFCC(data) {
 
   var N = data.length;
-  var nbEltAnalyse = Math.pow(2,Math.floor(Math.log(N)/Math.log(2)));
   var filtre = [];
 
   if ( N > 0 ) {
 
     var cutHamming = cutFenetrageHamming(data,4096,450);
     var NbHamming = cutHamming.length;
+
+    console.log(data);
+    console.log(NbHamming);
 
     for(var k = 0;k < NbHamming ;k++) {
       var soundData = [];
@@ -157,6 +187,10 @@ function algoMFCC(data) {
         console.log("Erreur fftWorker.js/fftData null");
       }
     }
+
+    if ( NbHamming == 0 ) {
+      console.log("0 Hamming MFCC nbData: " + N);
+    }
   }
   else {
     console.log("Erreur fftWorker.js/algoMFCC data.length null");
@@ -183,8 +217,6 @@ function filtreFreq(data,start,end) {
   for(var k = frequencyH; k < nbEltAnalyse-frequencyH;k++ ) {
     fftData[k] = complexOf(0,0);
   }
-
-  console.log(fftData);
 
   var res = fft(fftData,1);
   var arrayRes = new Float32Array(nbEltAnalyse);
@@ -232,38 +264,6 @@ function traitementFFT(data,incr) {
 
   return {"info": infoFFT, "reverse":fftReverse}
 }
-
-self.addEventListener('message', function(e) {
-  switch(e.data.command) {
-    case 'traitementFFT':
-      self.postMessage(
-        traitementFFT(e.data.data, e.data.incr)
-      );
-      break;
-    case 'testFFT':
-      self.postMessage(
-        testFFT()
-      );
-      break;
-    case 'cutSignal':
-      self.postMessage(
-        signalDetection(e.data.data)
-      );
-      break;
-    case 'algoMFCC':
-      self.postMessage(
-        algoMFCC(e.data.dataMicro)
-      );
-      break;
-    case 'filtreFreq':
-      self.postMessage(
-        filtreFreq(e.data.dataMicro, e.data.freqB, e.data.freqH)
-      );
-      break;
-  }
-
-}, false);
-
 
 function complexOf(a,b) {
   return {"real":a, "img":b};
@@ -561,6 +561,7 @@ function signalDetection(data) {
   }
 
   if ( tmp.length > 0 ) {
+    var n = tmp.length;
     var sub = tmp.slice(0,n-cmpt);
     res.push(sub);
   }
@@ -568,30 +569,6 @@ function signalDetection(data) {
 
   return res;
 }
-
-
-function testFFT() {
-
-   console.log("test coucou");
-   console.log();
-   var c1 = expComplex(0);
-   var c2 = expComplex(0);
-   console.log("test somme 1+0*i + 1 + 0*i");
-   console.log("real:" + addComplex(c1,c2)["real"]);
-   console.log("img:" + addComplex(c1,c2)["img"]);
-
-   var data = [0,1,2,3,4,5,6,7];
-   var dataC = fft(data,0);
-   console.log("fft");
-   console.log(dataC);
-   console.log(amplitudePhase(dataC,1));
-   console.log("inverse fft");
-   var inverseF  = inverseFFT(dataC,1);
-
-   var N = inverseFFT.length;
-   console.log( inverseF);
-
-};
 
 
 

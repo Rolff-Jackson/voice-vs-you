@@ -11,7 +11,7 @@ angular.module('voiceVsYouApp')
       return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
     }
 
-    function drawTable(datas) {
+    function drawImage(datas) {
       var colors = [];
 
       var N = datas[0]["values"].length;
@@ -54,6 +54,7 @@ angular.module('voiceVsYouApp')
           cutData[i]["values"].push(outputData[i][k]);
         }
       }
+
       return cutData;
     }
 
@@ -65,7 +66,7 @@ angular.module('voiceVsYouApp')
         MFCC[k]["values"] = data[k].slice(1,data[k].length/2+1);
       }
 
-      var colorMFCC = drawTable(MFCC);
+      var colorMFCC = drawImage(MFCC);
 
       return {"MFCC": MFCC,"color":colorMFCC}
     };
