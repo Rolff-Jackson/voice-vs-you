@@ -12,22 +12,22 @@ function extractDim(data,debut,fin,dim) {
 
 function algoDCT(data) {
   var N = data.length;
-  var y = new Array(N);
+  var y = new Array(2*N);
 
-  for(var i = 0; i < (N/2);i++) {
-    y[i] = data[2*i];
-    y[N-i-1] = data[2*i+1];
+  for(var i = 0; i < N ;i++) {
+    y[i] = data[i];
+    y[2*N-i-1] = data[i];
   }
 
   var fftY = fft(y,0);
   var res = [];
   for(var i = 0; i < N;i++) {
-    // expComplex = exp(-2*i*PI*arg)
-    // on veut exp(-i*PI*n/2*N)
     var tmp = multComplex(fftY[i],expComplex(i/4*N));
 
-    //var y = moduleComplex(tmp);
-    var y = Math.abs(tmp["real"]);
+    var y = moduleComplex(tmp);
+    y /= 2*Math.sqrt(N);
+   // y = divisComplex(y,complexOf(2*Math.sqrt(N),0));
+
     res.push([i,y]);
   }
 
