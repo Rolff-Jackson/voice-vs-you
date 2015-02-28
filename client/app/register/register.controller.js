@@ -9,6 +9,8 @@ angular.module('voiceVsYouApp')
     $scope.MFCC =  [{"key": "MFCC","values":[]}];
     $scope.colors = [];
 
+    var interval = 0;
+
     var truncate = function(val,num) {
       var coeffMult = Math.pow(10,num);
       var tronc = Math.round( coeffMult * val);
@@ -49,6 +51,15 @@ angular.module('voiceVsYouApp')
         $scope.Data[0]["values"] = signalTot;
         $scope.MFCC = MFCC;
         $scope.colors = Color;
+
+        interval = ($scope.colors[0].length/10);
+        var largeur = Math.floor(interval/5);
+        if ( interval%5 > 0 ) {
+          interval = Math.floor(5*(largeur+1));
+        }
+        else {
+          interval = 5*largeur;
+        }
       });
     };
 
@@ -56,5 +67,12 @@ angular.module('voiceVsYouApp')
       $scope.Data = [{"key": "Sound","values":[]}];
       $scope.DataReconstruct = [{"key": "Reconstruct","values":[]}];
     };
+
+
+    $scope.echelle = function(id) {
+      if ( id%interval == 0 && (id > 0) ) {
+        return true;
+      }
+    }
 
   }]);
