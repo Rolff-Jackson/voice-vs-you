@@ -25,7 +25,10 @@ function algoDCT(data) {
     // expComplex = exp(-2*i*PI*arg)
     // on veut exp(-i*PI*n/2*N)
     var tmp = multComplex(fftY[i],expComplex(i/4*N));
-    res.push([i,moduleComplex(tmp)]);
+
+    //var y = moduleComplex(tmp);
+    var y = Math.abs(tmp["real"]);
+    res.push([i,y]);
   }
 
   return res;

@@ -209,13 +209,17 @@ angular.module('voiceVsYouApp')
         var coeffs = $scope.MFCC[k]["values"];
 
         for(var l =0; l < coeffs.length;l++) {
-          var color = Math.floor(255 * ( coeffs[l][1] - min )/(max-min));
-          var hexColor = rgbToHex(color,0,0);
+          var color = Math.floor( (Math.pow(256,3) - 1) * ( coeffs[l][1] - min )/(max-min));
+          var r = Math.floor(color/256/256);
+          var g = Math.floor(color/256)%265
+          var b = color%256;
+          var hexColor = rgbToHex(r,g,b);
           colors[l][k]={color:hexColor};
         }
       }
 
       $scope.colors = colors;
     }
+    $scope.colors = [];
 
   }]);
