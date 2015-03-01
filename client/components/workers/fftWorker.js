@@ -16,7 +16,7 @@ self.addEventListener('message', function(e) {
       break;
     case 'algoMFCC':
       self.postMessage(
-        algoMFCC(e.data.dataMicro)
+        allCoeffMFCC(e.data.dataMicro)
       );
       break;
     case 'filtreFreq':
@@ -143,19 +143,27 @@ function normalizeMFCC(data) {
   return res;
 }
 
+
+function allCoeffMFCC(datas) {
+  var coeffsMFCC = [];
+
+  datas.forEach(function(signal,index) {
+    console.log(index)
+    algoMFCC(signal,coeffsMFCC);
+  });
+
+  return coeffsMFCC;
+}
+
 // à rajouter banc de Mel seulement entre 400 et 3400 Hertz
-function algoMFCC(data) {
+function algoMFCC(data,coeffsMFCC) {
 
   var N = data.length;
-  var filtre = [];
 
   if ( N > 0 ) {
 
     var cutHamming = cutFenetrageHamming(data,4096,450);
     var NbHamming = cutHamming.length;
-
-    console.log(data);
-    console.log(NbHamming);
 
     for(var k = 0;k < NbHamming ;k++) {
       var soundData = [];
@@ -181,7 +189,7 @@ function algoMFCC(data) {
 
         //sauvegarde des coefficients cepstraux
         var normalize = normalizeMFCC(tmp);
-        filtre.push(tmp);
+        coeffsMFCC.push(tmp);
       }
       else {
         console.log("Erreur fftWorker.js/fftData null");
@@ -195,7 +203,6 @@ function algoMFCC(data) {
   else {
     console.log("Erreur fftWorker.js/algoMFCC data.length null");
   }
-  return filtre;
 }
 
 

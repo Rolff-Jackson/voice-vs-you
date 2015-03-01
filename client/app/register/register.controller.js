@@ -50,16 +50,9 @@ angular.module('voiceVsYouApp')
         $scope.DataReconstruct = cutData;
         $scope.Data[0]["values"] = signalTot;
         $scope.MFCC = MFCC;
-        $scope.colors = Color;
+        $scope.colors = Color["data"];
+        interval = Color["interval"];
 
-        interval = ($scope.colors[0].length/10);
-        var largeur = Math.floor(interval/5);
-        if ( interval%5 > 0 ) {
-          interval = Math.floor(5*(largeur+1));
-        }
-        else {
-          interval = 5*largeur;
-        }
       });
     };
 

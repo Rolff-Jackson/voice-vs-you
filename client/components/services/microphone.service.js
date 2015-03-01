@@ -141,9 +141,13 @@ angular.module('voiceVsYouApp')
 
             //for(var k=0; k < outputData.length;k++) {
 
-            FftService.algoMFCC(outputData[0]).then(function(outputData) {
+            FftService.algoMFCC(outputData).then(function(coeffsMFCC) {
 
-              var infoMFCC = DrawService.drawMFCC(outputData);
+              var infoMFCC = [{"MFCC": [],"color": [{"data":[],"interval":0}]}];
+
+              if ( coeffsMFCC.length > 0 ) {
+                infoMFCC = DrawService.drawMFCC(coeffsMFCC);
+              }
 
               //show all curve
               for(var k = 0;  k < sound[0].length;k += 128) {

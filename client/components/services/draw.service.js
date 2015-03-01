@@ -60,13 +60,27 @@ angular.module('voiceVsYouApp')
 
     function drawMFCC(data) {
       var MFCC = [];
+      var interval = 0;
 
       for(var k=0; k< data.length;k++) {
         MFCC.push({"key": "MFCC num" + k,"values":[]});
         MFCC[k]["values"] = data[k].slice(1,data[k].length/2+1);
       }
 
-      var colorMFCC = drawImage(MFCC);
+      var color = drawImage(MFCC);
+
+      if ( color.length > 0 ) {
+        interval = (color.length/10);
+        var largeur = Math.floor(interval/5);
+        if ( interval%5 > 0 ) {
+          interval = Math.floor(5*(largeur+1));
+        }
+        else {
+          interval = 5*largeur;
+        }
+      }
+
+      var colorMFCC = {"data": color,"interval": interval};
 
       return {"MFCC": MFCC,"color":colorMFCC}
     };
