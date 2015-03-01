@@ -139,10 +139,8 @@ function normalizeMFCC(data) {
     console.log("Data Normalize is null");
   }
 
-
   return res;
 }
-
 
 function allCoeffMFCC(datas) {
   var coeffsMFCC = [];
@@ -159,10 +157,9 @@ function allCoeffMFCC(datas) {
 function algoMFCC(data,coeffsMFCC) {
 
   var N = data.length;
-
   if ( N > 0 ) {
 
-    var cutHamming = cutFenetrageHamming(data,4096,450);
+    var cutHamming = cutFenetrageHamming(data,1024,256);
     var NbHamming = cutHamming.length;
 
     for(var k = 0;k < NbHamming ;k++) {
@@ -188,7 +185,8 @@ function algoMFCC(data,coeffsMFCC) {
         tmp = algoDCT(tmp);
 
         //sauvegarde des coefficients cepstraux
-        var normalize = normalizeMFCC(tmp);
+        //var normalize = normalizeMFCC(tmp);
+
         coeffsMFCC.push(tmp);
       }
       else {
@@ -205,14 +203,31 @@ function algoMFCC(data,coeffsMFCC) {
   }
 }
 
+function ZeroPadding(data) {
+  var N = data.length;
+
+  var puissance = Math.floor(Math.log(N)/Math.log(2));
+  var nbEltAnalyse = Math.pow(2,puissance+1);
+
+  var nbDataZeroPadding = nbEltAnalyse - N;
+
+  var soundData =  new Float32Array(nbEltAnalyse);
+  soundData.set(data,0);
+
+  for(var k= 0; k < nbDataZeroPadding;k++) {
+    soundData.set([0],N+k);
+  }
+
+  return soundData;
+}
+
 
 function filtreFreq(data,start,end) {
   var N = data.length;
-  var nbEltAnalyse = Math.pow(2,Math.floor(Math.log(N)/Math.log(2)));
-  var soundData = data.subarray(0,nbEltAnalyse);
+  var soundData = ZeroPadding(data);
+  var nbEltAnalyse = data.length;
 
   var fftData = fft(soundData,0);
-
   var frequencyB = Math.floor(start * (N/45960) );
   var frequencyH = Math.floor(end * (N/45960) ) + 1;
 
@@ -226,9 +241,9 @@ function filtreFreq(data,start,end) {
   }
 
   var res = fft(fftData,1);
-  var arrayRes = new Float32Array(nbEltAnalyse);
+  var arrayRes = new Float32Array(N);
 
-  for(var k = 0; k < nbEltAnalyse;k++) {
+  for(var k = 0; k < N;k++) {
     arrayRes[k] = res[k]["real"]/nbEltAnalyse;
   }
 
@@ -241,6 +256,7 @@ function traitementFFT(data,incr) {
   var nbEltAnalyse = Math.pow(2,Math.floor(Math.log(N)/Math.log(2)));
   if ( N > 0 ) {
     var soundData = [];
+    //ZeroPadding(data);
     if ( data[0].length > 1 ) {
       soundData = extractDim(data,0,nbEltAnalyse,1);
     }

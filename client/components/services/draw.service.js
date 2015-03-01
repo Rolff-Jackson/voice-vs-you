@@ -64,7 +64,7 @@ angular.module('voiceVsYouApp')
 
       for(var k=0; k< data.length;k++) {
         MFCC.push({"key": "MFCC num" + k,"values":[]});
-        MFCC[k]["values"] = data[k].slice(1,data[k].length/2+1);
+        MFCC[k]["values"] = data[k].slice(1,data[k].length/2);
       }
 
       var color = drawImage(MFCC);

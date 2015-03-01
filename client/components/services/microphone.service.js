@@ -120,8 +120,6 @@ angular.module('voiceVsYouApp')
           res.push(output);
           res.push(output);
 
-          console.log(output);
-
           jsAudioRecorder.Recorder.exporDataWAV(function(blop) {
             download(blop);
 
