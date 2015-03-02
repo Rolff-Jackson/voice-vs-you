@@ -2,6 +2,8 @@
  * Created by mazurkiewicz on 11/02/15.
  */
 
+var frequence = 45960;
+
 self.addEventListener('message', function(e) {
   switch(e.data.command) {
     case 'traitementFFT':
@@ -221,6 +223,10 @@ function ZeroPadding(data) {
   return soundData;
 }
 
+function freqToIndice(freq,N) {
+  return Math.floor(freq * (N/frequence) );
+}
+
 
 function filtreFreq(data,start,end) {
   var N = data.length;
@@ -228,8 +234,8 @@ function filtreFreq(data,start,end) {
   var nbEltAnalyse = data.length;
 
   var fftData = fft(soundData,0);
-  var frequencyB = Math.floor(start * (N/45960) );
-  var frequencyH = Math.floor(end * (N/45960) ) + 1;
+  var frequencyB = freqToIndice(start,N);
+  var frequencyH = freqToIndice(end,N); + 1;
 
   for(var k = 0 ; k < frequencyB;k++ ) {
     fftData[k] = complexOf(0,0);
@@ -363,46 +369,49 @@ function filtreTriangulaire(t,T) {
 }
 
 // fonction utilisée sur l'amplitude du signal FFT
-
+// idee : ajuster pour freq entre 300 et 3400
 function filtreMel(data,nbFiltre) {
   var N = data.length;
-  var T = 2*echelleFreq_Mel(data[N-1][0])/nbFiltre;
+
+ /* var start = freqToIndice(300,N);
+  var end = freqToIndice(3400,N);
+  var T = 2*(echelleFreq_Mel(3400)-echelleFreq_Mel(300)+1)/nbFiltre;*/
+
+  console.log(data[N-1][0]);
+  console.log(freqToIndice(data[N-1][0],N));
+  console.log(N);
+
+  var T = 2*(echelleFreq_Mel(data[N-1][0])+1)/nbFiltre;
+  var start = 0;
+  var end = N;
+
   var res = [];
 
   for(var f = 0; f < nbFiltre;f++) {
     res.push([f,0]);
   }
 
-  for(var i= 0; i < N ;i++) {
+  for(var i= start; i < end ;i++) {
     var mel = echelleFreq_Mel(data[i][0]);
     var filtre = 0;
 
-    for(var k = 0; k < nbFiltre/2;k++) {
+    var k = Math.floor(mel/T);
 
-      if ( mel <= (k+1)*T  && mel >= k*T ) {
-        var energie = data[i][1]*filtreTriangulaire(mel-k*T,T);
-        res[2*k][1] += energie*energie;
-        if ( filtre == 0 ) {
-          filtre = 1;
-        }
+    if ( mel <= (k+1)*T  && mel >= k*T ) {
+      var energie = data[i][1]*filtreTriangulaire(mel-k*T,T);
+      res[2*k][1] += energie*energie;
+
+      if ( filtre == 0 ) {
+        filtre = 1;
       }
+    }
 
-      if ( ( mel <= T*(k + 1.5))  && ( mel >= T*(k+0.5) ) ) {
-        var energie = data[i][1]*filtreTriangulaire(mel-(k+0.5)*T,T);
-        res[2*k+1][1] += energie*energie;
-        if ( filtre == 0 ) {
-          filtre = 1;
-        }
+    if ( ( mel <= T*(k + 1.5))  && ( mel >= T*(k+0.5) ) ) {
+      var energie = data[i][1]*filtreTriangulaire(mel-(k+0.5)*T,T);
+      res[2*k+1][1] += energie*energie;
+      if ( filtre == 0 ) {
+        filtre = 1;
       }
-
-
-      if ( filtre > 0 ) {
-        filtre++;
-      }
-      else if ( filtre == 3 ) {
-        break;
-      }
-
     }
   }
 
@@ -490,14 +499,12 @@ function amplitudePhase(dataC,incr) {
   var module = [];
   var phase = [];
 
-  var frequency = 45056;
-
   var nbEltAnalyse = dataC.length;
-  var N = (nbEltAnalyse/2) + 2;
+
   if ( incr > 0 ) {
-    for(var i = 0 ; i < N ;i = i + incr) {
+    for(var i = 0 ; i < nbEltAnalyse ;i = i + incr) {
       var elt = dataC[i];
-      var xFreq  = frequency*i/nbEltAnalyse;
+      var xFreq  = frequence*i/nbEltAnalyse;
 
       module.push([xFreq,moduleComplex(elt)]);
       phase.push([xFreq,phaseComplex(elt)]);
@@ -507,7 +514,7 @@ function amplitudePhase(dataC,incr) {
     console.log("Incr must be a positif integer ");
   }
 
-  return {"amplitude":module,"phase":phase,"nbData": N};
+  return {"amplitude":module,"phase":phase,"nbData": nbEltAnalyse};
 }
 
 function inverseFFT(dataC,incr) {
