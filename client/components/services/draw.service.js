@@ -11,6 +11,66 @@ angular.module('voiceVsYouApp')
       return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
     }
 
+    function calculIntervalRepartition(infoStat) {
+      var moy = infoStat["moy"];
+      var min = infoStat["min"];
+      var max = infoStat["max"];
+      var ecartType = infoStat["ecartType"];
+
+      var interval = [];
+      interval.push({"d": min,"f":((moy+min)/2)});
+      interval.push({"d": (moy+min)/2,"f":moy});
+      interval.push({"d": moy,"f":((2*moy+ecartType)/2)});
+      interval.push({"d": (2*moy+ecartType)/2,"f":(moy+ecartType)});
+      interval.push({"d": moy+ecartType,"f":(max+moy+ecartType)/2});
+      interval.push({"d": (max+moy+ecartType)/2,"f":max});
+
+      return interval;
+    }
+
+    function convertionInterval(color,interval,i) {
+      return 255*(color-interval[i]["d"])/(interval[i]["f"] - interval[i]["d"]);
+    }
+
+    function algoRepartitionCouleur(color,interval) {
+      var r =0, g = 0, b= 0;
+      var convertionColor = 0;
+
+      if ( color < interval[0]["f"] ) {
+        convertionColor = convertionInterval(color,interval,0);
+        b = convertionColor;
+      }
+      else if ( color < interval[1]["f"] ) {
+        convertionColor = convertionInterval(color,interval,1);
+        g = convertionColor;
+        b = 255;
+      }
+      else if ( color < interval[2]["f"] ) {
+        convertionColor = convertionInterval(color,interval,2);
+        g = 255;
+        b = 255 - convertionColor;
+      }
+      else if ( color < interval[3]["f"] ) {
+        convertionColor = convertionInterval(color,interval,3);
+        r = convertionColor;
+        g = 255;
+      }
+      else if ( color < interval[4]["f"] ) {
+        convertionColor = convertionInterval(color,interval,4);
+        convertionColor = (255-140) *(convertionColor/255);
+        r = 255;
+        g = 255 - convertionColor;
+      }
+      else {
+        convertionColor = convertionInterval(color,interval,5);
+        convertionColor = 140 *(convertionColor/255);
+        r = 255;
+        g = 160 - convertionColor;
+      }
+
+      return rgbToHex(r,g,b);
+    }
+
     function drawImage(datas) {
       var colors = [];
 
@@ -18,28 +78,45 @@ angular.module('voiceVsYouApp')
       var max = datas[0]["values"][0][1];
       var min = datas[0]["values"][0][1];
 
+      var moyenne = 0;
+      var variance = 0;
+      var nbCoeff = 0;
+
       for(var l = 0; l < N;l++) {
         colors.push([]);
         for(var k = 0; k < datas.length;k++) {
           var coeffs = datas[k]["values"];
+
+          moyenne += coeffs[l][1];
+          variance += coeffs[l][1] * coeffs[l][1];
+          nbCoeff++;
+
           if ( coeffs[l][1] > max ) { max = coeffs[l][1]};
           if ( coeffs[l][1] < min ) { min = coeffs[l][1]};
           colors[l].push([]);
         }
       }
 
+      moyenne /= nbCoeff;
+      variance /= nbCoeff;
+      variance -= (moyenne*moyenne);
+      var ecartType = Math.sqrt(variance);
+
+      console.log("moyenne : " + moyenne);
+      console.log("ecart-type : " + Math.sqrt(variance))
+
       for(var k =0; k < datas.length;k++) {
         var coeffs = datas[k]["values"];
 
         for(var l =0; l < coeffs.length;l++) {
-          var color = Math.floor( (Math.pow(256,3) - 1) * ( coeffs[l][1] - min )/(max-min));
-          var r = Math.floor(color/256/256);
-          var g = Math.floor(color/256)%265
-          var b = color%256;
-          var hexColor = rgbToHex(r,g,b);
+         // var coeff = ( coeffs[l][1] - min )/(max-min);
+          var interval = calculIntervalRepartition({"moy":moyenne,"ecartType":ecartType,"min":min,"max":max});
+          var hexColor = algoRepartitionCouleur(coeffs[l][1],interval);
+
           colors[l][k]={color:hexColor};
         }
       }
+
 
       return colors;
     }

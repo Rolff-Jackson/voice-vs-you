@@ -116,10 +116,10 @@ angular.module('voiceVsYouApp')
         jsAudioRecorder.Recorder.stop();
 
         var start  = new Date();
-        FftService.filtreFreq(sound[0],300,3400).then(function(output) {
+        FftService.filtreFreq(sound[0],300,3400).then(function(signalFiltre) {
           var res = [];
-          res.push(output);
-          res.push(output);
+          res.push(signalFiltre);
+          res.push(signalFiltre);
 
           jsAudioRecorder.Recorder.exporDataWAV(function(blop) {
             download(blop);
@@ -130,7 +130,7 @@ angular.module('voiceVsYouApp')
 
           },res);
 
-          var signal = output; //sound[0]
+          var signal = signalFiltre; //sound[0]
 
           var endFiltre = new Date();
           console.log("Time filtre: " + (endFiltre-start) );

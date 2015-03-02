@@ -115,15 +115,13 @@ function normalizeMFCC(data) {
       }
 
     }
-    console.log("start");
-    console.log("moy: " + moy + "\nvariance: " + variance);
 
     variance /= (N/2);
     moy /= (N/2);
-    variance = (variance - (moy*moy) );
+    variance -= (moy*moy);
 
-    console.log("moy: " + moy + "\nvariance: " + variance);
-    console.log("end");
+    console.log("moy: " + moy );
+    console.log("ecart-type: " + Math.sqrt(variance));
 
     for(var k=1; k < (N/2) + 1;k++) {
 
@@ -187,7 +185,7 @@ function algoMFCC(data,coeffsMFCC) {
         tmp = algoDCT(tmp);
 
         //sauvegarde des coefficients cepstraux
-        //var normalize = normalizeMFCC(tmp);
+        var normalize = normalizeMFCC(tmp);
 
         coeffsMFCC.push(tmp);
       }
@@ -231,26 +229,28 @@ function freqToIndice(freq,N) {
 function filtreFreq(data,start,end) {
   var N = data.length;
   var soundData = ZeroPadding(data);
-  var nbEltAnalyse = data.length;
+  var nbEltAnalyse = soundData.length;
 
   var fftData = fft(soundData,0);
-  var frequencyB = freqToIndice(start,N);
-  var frequencyH = freqToIndice(end,N); + 1;
 
-  for(var k = 0 ; k < frequencyB;k++ ) {
-    fftData[k] = complexOf(0,0);
-    fftData[nbEltAnalyse-k-1] = complexOf(0,0);
+  var frequencyB = freqToIndice(start,nbEltAnalyse);
+  var frequencyH = freqToIndice(end,nbEltAnalyse); + 1;
+
+  for(var m = 0 ; m < frequencyB;m++ ) {
+    fftData[m] = complexOf(0,0);
+    fftData[nbEltAnalyse-m-1] = complexOf(0,0);
   }
 
   for(var k = frequencyH; k < nbEltAnalyse-frequencyH;k++ ) {
     fftData[k] = complexOf(0,0);
   }
 
-  var res = fft(fftData,1);
+  var signalReconstrut = fft(fftData,1);
+
   var arrayRes = new Float32Array(N);
 
   for(var k = 0; k < N;k++) {
-    arrayRes[k] = res[k]["real"]/nbEltAnalyse;
+    arrayRes[k] = signalReconstrut[k]["real"] / nbEltAnalyse;
   }
 
   return arrayRes;
@@ -377,10 +377,6 @@ function filtreMel(data,nbFiltre) {
   var end = freqToIndice(3400,N);
   var T = 2*(echelleFreq_Mel(3400)-echelleFreq_Mel(300)+1)/nbFiltre;*/
 
-  console.log(data[N-1][0]);
-  console.log(freqToIndice(data[N-1][0],N));
-  console.log(N);
-
   var T = 2*(echelleFreq_Mel(data[N-1][0])+1)/nbFiltre;
   var start = 0;
   var end = N;
@@ -420,7 +416,13 @@ function filtreMel(data,nbFiltre) {
 
 function logData(data) {
   for(var i = 0; i < data.length;i++) {
-    data[i] = Math.log(data[i][1]);
+    if ( data[i][1] > 0 ) {
+      data[i] = Math.log(data[i][1]);
+    }
+    else {
+      console.log("Error calcul log MFCC data[i][1] negatif");
+    }
+
   }
   return data;
 }
