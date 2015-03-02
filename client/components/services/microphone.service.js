@@ -115,6 +115,7 @@ angular.module('voiceVsYouApp')
       jsAudioRecorder.Recorder.getBuffer(function(sound) {
         jsAudioRecorder.Recorder.stop();
 
+        var start  = new Date();
         FftService.filtreFreq(sound[0],300,3400).then(function(output) {
           var res = [];
           res.push(output);
@@ -129,9 +130,10 @@ angular.module('voiceVsYouApp')
 
           },res);
 
-          console.log("nb data: " + output.length);
-
           var signal = output; //sound[0]
+
+          var endFiltre = new Date();
+          console.log("Time filtre: " + (endFiltre-start) );
 
           FftService.cutSignal(signal).then(function (outputData) {
 
@@ -139,6 +141,8 @@ angular.module('voiceVsYouApp')
 
             //for(var k=0; k < outputData.length;k++) {
 
+            var endCut = new Date();
+            console.log("Time algo cutSignal : " + (endCut-endFiltre) );
             FftService.algoMFCC(outputData).then(function(coeffsMFCC) {
 
               var infoMFCC = [{"MFCC": [],"color": [{"data":[],"interval":0}]}];
@@ -151,6 +155,9 @@ angular.module('voiceVsYouApp')
               for(var k = 0;  k < sound[0].length;k += 128) {
                 signalTot.push([k,sound[0][k]]);
               }
+
+              console.log("Time algo MFCC : " + (new Date()-endCut) );
+              console.log("All Time: " + (new Date()-start) );
 
               callback(cutData,signalTot,infoMFCC["MFCC"],infoMFCC["color"])
             });

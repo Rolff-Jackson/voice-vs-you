@@ -355,7 +355,7 @@ function fenetreHamming(data) {
 
 function filtreTriangulaire(t,T) {
   if ( t < T/2 ) {
-    return 2*t/T;
+    return 2*(t-T)/T;
   }
   else {
     return 2*(T-t)/T;
@@ -366,7 +366,7 @@ function filtreTriangulaire(t,T) {
 
 function filtreMel(data,nbFiltre) {
   var N = data.length;
-  var T = echelleFreq_Mel(data[N-1][0])/nbFiltre;
+  var T = 2*echelleFreq_Mel(data[N-1][0])/nbFiltre;
   var res = [];
 
   for(var f = 0; f < nbFiltre;f++) {
@@ -377,26 +377,24 @@ function filtreMel(data,nbFiltre) {
     var mel = echelleFreq_Mel(data[i][0]);
     var filtre = 0;
 
-    for(var k = 0; k < nbFiltre;k++) {
+    for(var k = 0; k < nbFiltre/2;k++) {
 
-      if ( k%2 == 0 ) {
-        if ( mel <= (k+1)*T  && mel >= k*T ) {
-          var energie = data[i][1]*filtreTriangulaire(mel,T*(k+1));
-          res[k][1] += energie*energie;
-          if ( filtre == 0 ) {
-            filtre = 1;
-          }
+      if ( mel <= (k+1)*T  && mel >= k*T ) {
+        var energie = data[i][1]*filtreTriangulaire(mel-k*T,T);
+        res[2*k][1] += energie*energie;
+        if ( filtre == 0 ) {
+          filtre = 1;
         }
       }
-      else {
-        if ( ( mel <= T*(k + 0.5))  && ( mel >= T*(k-0.5) ) ) {
-          var energie = data[i][1]*filtreTriangulaire(mel,T*(k+0.5));
-          res[k][1] += energie*energie;
-          if ( filtre == 0 ) {
-            filtre = 1;
-          }
+
+      if ( ( mel <= T*(k + 1.5))  && ( mel >= T*(k+0.5) ) ) {
+        var energie = data[i][1]*filtreTriangulaire(mel-(k+0.5)*T,T);
+        res[2*k+1][1] += energie*energie;
+        if ( filtre == 0 ) {
+          filtre = 1;
         }
       }
+
 
       if ( filtre > 0 ) {
         filtre++;
