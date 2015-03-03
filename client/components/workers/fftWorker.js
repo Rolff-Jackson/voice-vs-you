@@ -12,9 +12,16 @@ self.addEventListener('message', function(e) {
       );
       break;
     case 'cutSignal':
-      self.postMessage(
-        signalDetection(e.data.data)
-      );
+      var cutSignal = signalDetection(e.data.data);
+      if ( cutSignal.length > 0 ) {
+        self.postMessage(
+          cutSignal
+        );
+      }
+      else {
+        console.log("Aucun Signal valide");
+      }
+
       break;
     case 'algoMFCC':
       self.postMessage(
@@ -99,10 +106,11 @@ function normalizeMFCC(data) {
   var res = [];
   var moy = 0;
   var variance = 0;
+  var nbCoeff = 13;
 
   if ( N > 0 ) {
 
-    for(var k=1; k < (N/2) + 1;k++) {
+    for(var k=1; k < nbCoeff + 1;k++) {
 
       if ( data[k].length > 1 ) {
         var tmp = data[k][1];
@@ -116,14 +124,11 @@ function normalizeMFCC(data) {
 
     }
 
-    variance /= (N/2);
-    moy /= (N/2);
+    variance /= nbCoeff;
+    moy /= nbCoeff;
     variance -= (moy*moy);
 
-    console.log("moy: " + moy );
-    console.log("ecart-type: " + Math.sqrt(variance));
-
-    for(var k=1; k < (N/2) + 1;k++) {
+    for(var k=1; k < nbCoeff + 1;k++) {
 
       if ( data[k].length > 1 ) {
         var tmp = (data[k][1]-moy) / variance;
@@ -152,11 +157,37 @@ function allCoeffMFCC(datas) {
 
   return coeffsMFCC;
 }
+// MFCC : dim 1 fenetre dim 2 coeff
+function coeffDelta(MFCC){
+  var deltas = [];
+
+  for (var k=0; k < MFCC.length ;k++) {
+    deltas.push([]);
+    for(var n=0;n < MFCC[k].length;n++) {
+      var delta = 0;
+
+      if ( k > 1 ) {
+        delta -= MFCC[k-1][n][1];
+      }
+      if ( (k+1) < MFCC.length ) {
+        delta += MFCC[k+1][n][1];
+      }
+
+      delta /= 2;
+
+      deltas[k].push(delta);
+    }
+  }
+  console.log(deltas);
+
+  return deltas;
+}
 
 // à rajouter banc de Mel seulement entre 400 et 3400 Hertz
 function algoMFCC(data,coeffsMFCC) {
 
   var N = data.length;
+
   if ( N > 0 ) {
 
     var cutHamming = cutFenetrageHamming(data,1024,256);
@@ -185,7 +216,7 @@ function algoMFCC(data,coeffsMFCC) {
         tmp = algoDCT(tmp);
 
         //sauvegarde des coefficients cepstraux
-        var normalize = normalizeMFCC(tmp);
+        //var normalize = normalizeMFCC(tmp);
 
         coeffsMFCC.push(tmp);
       }
@@ -420,6 +451,7 @@ function logData(data) {
       data[i] = Math.log(data[i][1]);
     }
     else {
+      data[i] = 0;
       console.log("Error calcul log MFCC data[i][1] negatif");
     }
 

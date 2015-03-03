@@ -63,9 +63,14 @@ angular.module('voiceVsYouApp')
       }
       else {
         convertionColor = convertionInterval(color,interval,5);
-        convertionColor = 140 *(convertionColor/255);
-        r = 255;
-        g = 160 - convertionColor;
+        convertionColor = convertionColor;
+        if ( convertionColor <= 160 ) {
+          r = 255;
+          g = 160 - convertionColor;
+        }
+        else {
+          r = 255 - (convertionColor - 160);
+        }
       }
 
       return rgbToHex(r,g,b);
@@ -74,9 +79,14 @@ angular.module('voiceVsYouApp')
     function drawImage(datas) {
       var colors = [];
 
-      var N = datas[0]["values"].length;
-      var max = datas[0]["values"][0][1];
-      var min = datas[0]["values"][0][1];
+      var N = datas[0].length;
+      var max = datas[0][0];
+      var min = datas[0][0];
+
+      if ( max.length > 1 ) {
+        max = max[1];
+        min = min[1];
+      }
 
       var moyenne = 0;
       var variance = 0;
@@ -85,14 +95,23 @@ angular.module('voiceVsYouApp')
       for(var l = 0; l < N;l++) {
         colors.push([]);
         for(var k = 0; k < datas.length;k++) {
-          var coeffs = datas[k]["values"];
+          var coeffs = datas[k];
+          var data = 0;
 
-          moyenne += coeffs[l][1];
-          variance += coeffs[l][1] * coeffs[l][1];
+          if ( datas[k][l].length > 1 ) {
+            data = datas[k][l][1];
+          }
+          else {
+            data = datas[k][l];
+          }
+
+
+          moyenne += data;
+          variance += data * data;
           nbCoeff++;
 
-          if ( coeffs[l][1] > max ) { max = coeffs[l][1]};
-          if ( coeffs[l][1] < min ) { min = coeffs[l][1]};
+          if ( data > max ) { max = data};
+          if ( data < min ) { min = data};
           colors[l].push([]);
         }
       }
@@ -105,14 +124,23 @@ angular.module('voiceVsYouApp')
       console.log("moyenne : " + moyenne);
       console.log("ecart-type : " + Math.sqrt(variance))
 
+      var interval = calculIntervalRepartition({"moy":moyenne,"ecartType":ecartType,"min":min,"max":max});
+
       for(var k =0; k < datas.length;k++) {
-        var coeffs = datas[k]["values"];
+        var coeffs =  datas[k];
 
         for(var l =0; l < coeffs.length;l++) {
-         // var coeff = ( coeffs[l][1] - min )/(max-min);
-          var interval = calculIntervalRepartition({"moy":moyenne,"ecartType":ecartType,"min":min,"max":max});
-          var hexColor = algoRepartitionCouleur(coeffs[l][1],interval);
 
+          var data = 0;
+
+          if ( datas[k][l].length > 1 ) {
+            data = datas[k][l][1];
+          }
+          else {
+            data = datas[k][l];
+          }
+
+          var hexColor = algoRepartitionCouleur(data,interval);
           colors[l][k]={color:hexColor};
         }
       }
@@ -138,16 +166,21 @@ angular.module('voiceVsYouApp')
     function drawMFCC(data) {
       var MFCC = [];
       var interval = 0;
-
+      var tmp = [];
       for(var k=0; k< data.length;k++) {
         MFCC.push({"key": "MFCC num" + k,"values":[]});
-        MFCC[k]["values"] = data[k].slice(1,data[k].length/2);
+        data[k] = data[k].slice(1,13);
+        MFCC[k]["values"] = data[k];
       }
 
-      var color = drawImage(MFCC);
+      var colorMFCC = drawImage(data);
 
-      if ( color.length > 0 ) {
-        interval = (color.length/10);
+      var deltaMFCC = coeffDelta(data);
+      var colorDelta = drawImage(deltaMFCC);
+
+
+      if ( colorMFCC.length > 0 ) {
+        interval = (colorMFCC.length/10);
         var largeur = Math.floor(interval/5);
         if ( interval%5 > 0 ) {
           interval = Math.floor(5*(largeur+1));
@@ -157,9 +190,9 @@ angular.module('voiceVsYouApp')
         }
       }
 
-      var colorMFCC = {"data": color,"interval": interval};
+      var colorCoeff = {"MFCC": colorMFCC,"delta":colorDelta,"interval": interval};
 
-      return {"MFCC": MFCC,"color":colorMFCC}
+      return {"MFCC": MFCC,"color":colorCoeff}
     };
 
     return {

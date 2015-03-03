@@ -135,15 +135,13 @@ angular.module('voiceVsYouApp')
           var endFiltre = new Date();
           console.log("Time filtre: " + (endFiltre-start) );
 
-          FftService.cutSignal(signal).then(function (outputData) {
+          FftService.cutSignal(signal).then(function (signalCut) {
 
-            cutData = DrawService.drawCut(outputData);
-
-            //for(var k=0; k < outputData.length;k++) {
+            cutData = DrawService.drawCut(signalCut);
 
             var endCut = new Date();
             console.log("Time algo cutSignal : " + (endCut-endFiltre) );
-            FftService.algoMFCC(outputData).then(function(coeffsMFCC) {
+            FftService.algoMFCC(signalCut).then(function(coeffsMFCC) {
 
               var infoMFCC = [{"MFCC": [],"color": [{"data":[],"interval":0}]}];
 

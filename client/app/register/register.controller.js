@@ -50,7 +50,8 @@ angular.module('voiceVsYouApp')
         $scope.DataReconstruct = cutData;
         $scope.Data[0]["values"] = signalTot;
         $scope.MFCC = MFCC;
-        $scope.colors = Color["data"];
+        $scope.colors = Color["MFCC"];
+        $scope.deltaColor = Color["delta"];
         interval = Color["interval"];
 
       });
