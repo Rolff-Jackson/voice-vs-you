@@ -162,21 +162,33 @@ function coeffDelta(MFCC){
   var deltas = [];
 
   for (var k=0; k < MFCC.length ;k++) {
-    deltas.push([]);
+    var tmp = [];
     for(var n=0;n < MFCC[k].length;n++) {
       var delta = 0;
 
       if ( k > 1 ) {
-        delta -= MFCC[k-1][n][1];
+        var data = MFCC[k-1][n];
+        if ( data.length > 1 ) {
+          delta -= MFCC[k-1][n][1];
+        }
+        else {
+          delta -= MFCC[k-1][n];
+        }
       }
       if ( (k+1) < MFCC.length ) {
-        delta += MFCC[k+1][n][1];
+        var data = MFCC[k+1][n];
+        if ( data.length > 1 ) {
+          delta += MFCC[k+1][n][1];
+        }
+        else {
+          delta += MFCC[k+1][n];
+        }
       }
 
       delta /= 2;
-
-      deltas[k].push(delta);
+      tmp.push(delta);
     }
+    deltas.push(tmp);
   }
   console.log(deltas);
 

@@ -106,6 +106,41 @@
           </table>
         </h4>
 
+        <h4>Coeff Cepstraux Delta-Delta Image
+          <table>
+            <tr>
+              <td>
+                <table>
+                  <tr ng-repeat="case in deltadelta track by $index" height="20px">
+                    <td width="20px"> {{$index + 1}} </td>
+                  </tr>
+                  <tr height="20px">
+
+                  </tr>
+                </table>
+              </td>
+              <td>
+                <div id="conteneur">
+                  <table width="{{20*deltadelta[0].length}}px">
+                    <tr ng-repeat="case in deltadelta track by $index" height="20px">
+                      <!--<td width="20px"> {{$index + 1}} </td>-->
+                      <td ng-repeat="elt in case" bgcolor="{{elt.color}}" width="20px" > </td>
+                    </tr>
+                    <tr height="20px">
+                      <td ng-repeat="elt in deltadelta[0] track by $index" width="20px">
+                        <div ng-if="echelle($index + 1)">
+                          {{$index + 1}}
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </h4>
+
+
         <h4>Coeff Cepstraux Barre
           <nvd3-multi-bar-chart
             data="MFCC"

@@ -178,6 +178,8 @@ angular.module('voiceVsYouApp')
       var deltaMFCC = coeffDelta(data);
       var colorDelta = drawImage(deltaMFCC);
 
+      var delta_deltaMFCC = coeffDelta(deltaMFCC);
+      var colorDeltaDelta = drawImage(delta_deltaMFCC);
 
       if ( colorMFCC.length > 0 ) {
         interval = (colorMFCC.length/10);
@@ -190,7 +192,7 @@ angular.module('voiceVsYouApp')
         }
       }
 
-      var colorCoeff = {"MFCC": colorMFCC,"delta":colorDelta,"interval": interval};
+      var colorCoeff = {"MFCC": colorMFCC,"delta":colorDelta,"delta-delta":colorDeltaDelta,"interval": interval};
 
       return {"MFCC": MFCC,"color":colorCoeff}
     };
