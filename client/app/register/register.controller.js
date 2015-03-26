@@ -54,7 +54,6 @@ angular.module('voiceVsYouApp')
         $scope.deltaColor = Color["delta"];
         $scope.deltadelta = Color["delta-delta"];
         interval = Color["interval"];
-
       });
     };
 

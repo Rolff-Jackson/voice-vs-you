@@ -121,9 +121,6 @@ angular.module('voiceVsYouApp')
       variance -= (moyenne*moyenne);
       var ecartType = Math.sqrt(variance);
 
-      console.log("moyenne : " + moyenne);
-      console.log("ecart-type : " + Math.sqrt(variance))
-
       var interval = calculIntervalRepartition({"moy":moyenne,"ecartType":ecartType,"min":min,"max":max});
 
       for(var k =0; k < datas.length;k++) {
