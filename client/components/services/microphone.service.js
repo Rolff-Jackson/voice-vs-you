@@ -146,9 +146,9 @@ angular.module('voiceVsYouApp')
           console.log("Time algo MFCC : " + (new Date()-endCut) );
           console.log("All Time: " + (new Date()-startAlgo) );
 
-          callback(cutData,signalTot,infoMFCC["MFCC"],infoMFCC["color"])
+          callback(cutData,signalTot,infoMFCC["AllMFCC"],infoMFCC["color"]);
+          jsAudioRecorder.Recorder.clear();
         });
-
       });
     }
 

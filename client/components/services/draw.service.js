@@ -5,7 +5,7 @@
 'use strict';
 
 angular.module('voiceVsYouApp')
-  .factory('DrawService', ['FftService', function (FftService) {
+  .factory('DrawService', [ function () {
 
     function rgbToHex(r, g, b) {
       return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
@@ -142,7 +142,6 @@ angular.module('voiceVsYouApp')
         }
       }
 
-
       return colors;
     }
 
@@ -158,6 +157,43 @@ angular.module('voiceVsYouApp')
       }
 
       return cutData;
+    }
+
+    // MFCC : dim 1 fenetre dim 2 coeff
+    function coeffDelta(MFCC){
+      var deltas = [];
+
+      for (var k=0; k < MFCC.length ;k++) {
+        var tmp = [];
+        for(var n=0;n < MFCC[k].length;n++) {
+          var delta = 0;
+
+          if ( k > 1 ) {
+            var data = MFCC[k-1][n];
+            if ( data.length > 1 ) {
+              delta -= MFCC[k-1][n][1];
+            }
+            else {
+              delta -= MFCC[k-1][n];
+            }
+          }
+          if ( (k+1) < MFCC.length ) {
+            var data = MFCC[k+1][n];
+            if ( data.length > 1 ) {
+              delta += MFCC[k+1][n][1];
+            }
+            else {
+              delta += MFCC[k+1][n];
+            }
+          }
+
+          delta /= 2;
+          tmp.push(delta);
+        }
+        deltas.push(tmp);
+      }
+
+      return deltas;
     }
 
     function drawMFCC(data) {
@@ -190,8 +226,9 @@ angular.module('voiceVsYouApp')
       }
 
       var colorCoeff = {"MFCC": colorMFCC,"delta":colorDelta,"delta-delta":colorDeltaDelta,"interval": interval};
+      var AllMFCC = {"MFCCDraw": MFCC,"MFCC":data,"Delta":deltaMFCC,"DeltaDelta":delta_deltaMFCC}
 
-      return {"MFCC": MFCC,"color":colorCoeff}
+      return {"AllMFCC": AllMFCC,"color":colorCoeff}
     };
 
     return {

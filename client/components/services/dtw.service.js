@@ -5,22 +5,33 @@
 angular.module('voiceVsYouApp')
   .factory('dtw', ['FftService', 'DrawService',function (FftService,DrawService) {
 
+    function data(P) {
+      if (P.length > 1 ) {
+        return P[1];
+      }
+      return P;
+    }
     function distanceVecteurs(A, B) {
       var distance = 0;
+
       for (var i = 0; i < A.length; i++) {
-        distance += (A[i] - B[i])(A[i] - B[i]);
+        distance += (data(B[i]) - data(A[i]) )*(data(B[i]) - data(A[i]));
       }
+
       return Math.sqrt(distance);
     }
 
-    function initdistance(A) {
-      var DTW = [];
-      for (var i = 0; i < A[0].length; i++) {
+    function initdistance(n,m) {
+      var DTW = new Array(n);
+
+      for (var i = 0; i < n; i++) {
+        DTW[i] = new Array(m);
         DTW[i][0] = 0;
       }
-      for (var i = 0; i < A[1].length; i++) {
+      for (var j = 0; j < m; j++) {
         DTW[0][j] = 0;
       }
+
       return DTW;
     }
 
@@ -35,15 +46,29 @@ angular.module('voiceVsYouApp')
       return mini2(a, mini2(b, c));
     }
 
+    // A, B ligne fenetre de Hamming  ; colonne les coeffs MFCC ( A test, B ref )
     function distanceCumulee(A, B) {
-      var distance = 0;
-      var DTW = initdistance(A);
-      for (var i = 1; i < A[0].length; i++) {
-        for (var j = 1; j < A[1].length; j++) {
-          var cout = Math.sqrt(Math.pow(distanceVecteurs(A[i][0], B[j][0], 2)) + Math.pow(distanceVecteurs(A[i][1], B[j][1], 2)));
+      var n = A.length;
+      var m = A[0].length;
+
+      var DTW = initdistance(n,m);
+
+      for (var i = 1; i < n; i++) {
+        for (var j = 1; j < m; j++) {
+
+          var cout = distanceVecteurs(A[i],B[j]);
           DTW[i][j] = cout + mini3(DTW[i - 1][j], DTW[i][j - 1], DTW[i - 1][j - 1]);
+
         }
       }
-      return DTW;
+
+      return DTW[n-1][m-1];
     }
-  }])
+
+    return {
+      distanceCumulee: function(A,B) {
+        return distanceCumulee(A,B);
+      }
+    }
+
+  }]);

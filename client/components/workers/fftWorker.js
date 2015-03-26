@@ -21,7 +21,6 @@ self.addEventListener('message', function(e) {
       else {
         console.log("Aucun Signal valide");
       }
-
       break;
     case 'algoMFCC':
       self.postMessage(
@@ -156,42 +155,6 @@ function allCoeffMFCC(datas) {
 
   return coeffsMFCC;
 }
-// MFCC : dim 1 fenetre dim 2 coeff
-function coeffDelta(MFCC){
-  var deltas = [];
-
-  for (var k=0; k < MFCC.length ;k++) {
-    var tmp = [];
-    for(var n=0;n < MFCC[k].length;n++) {
-      var delta = 0;
-
-      if ( k > 1 ) {
-        var data = MFCC[k-1][n];
-        if ( data.length > 1 ) {
-          delta -= MFCC[k-1][n][1];
-        }
-        else {
-          delta -= MFCC[k-1][n];
-        }
-      }
-      if ( (k+1) < MFCC.length ) {
-        var data = MFCC[k+1][n];
-        if ( data.length > 1 ) {
-          delta += MFCC[k+1][n][1];
-        }
-        else {
-          delta += MFCC[k+1][n];
-        }
-      }
-
-      delta /= 2;
-      tmp.push(delta);
-    }
-    deltas.push(tmp);
-  }
-
-  return deltas;
-}
 
 // à rajouter banc de Mel seulement entre 400 et 3400 Hertz
 function algoMFCC(data,coeffsMFCC) {
@@ -266,7 +229,6 @@ function freqToIndice(freq,N) {
   return Math.floor(freq * (N/frequence) );
 }
 
-
 function filtreFreq(data,start,end) {
   var N = data.length;
   var soundData = ZeroPadding(data);
@@ -275,7 +237,7 @@ function filtreFreq(data,start,end) {
   var fftData = fft(soundData,0);
 
   var frequencyB = freqToIndice(start,nbEltAnalyse);
-  var frequencyH = freqToIndice(end,nbEltAnalyse); + 1;
+  var frequencyH = freqToIndice(end,nbEltAnalyse);
 
   for(var m = 0 ; m < frequencyB;m++ ) {
     fftData[m] = complexOf(0,0);
@@ -464,7 +426,6 @@ function logData(data) {
       data[i] = 0;
       console.log("Error calcul log MFCC data[i][1] negatif");
     }
-
   }
   return data;
 }
@@ -634,6 +595,7 @@ function signalDetection(data) {
 
   if ( tmp.length > 0 ) {
     var n = tmp.length;
+
     var sub = tmp.slice(0,n-cmpt);
     res.push(sub);
   }

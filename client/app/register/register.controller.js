@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('voiceVsYouApp')
-  .controller('RegisterCtrl', ['$scope','$interval','MicrophoneService',function ($scope,$interval,MicrophoneService) {
+  .controller('RegisterCtrl', ['$scope','$interval','MicrophoneService','dtw',function ($scope,$interval,MicrophoneService,dtw) {
 
     $scope.Data = [{"key": "Sound","values":[]}];
     $scope.DataReconstruct = [{"key": "Reconstruct","values":[]}];
@@ -45,15 +45,36 @@ angular.module('voiceVsYouApp')
       MicrophoneService.drawMicrophone($scope.Data[0]["values"]);
     };
 
+    $scope.tmp1;
+    $scope.tmp2;
+    $scope.tmp3;
+
     $scope.stopRecordingData = function() {
-      MicrophoneService.stopDraw(function(cutData,signalTot,MFCC,Color) {
+      MicrophoneService.stopDraw(function(cutData,signalTot,AllMFCC,Color) {
         $scope.DataReconstruct = cutData;
         $scope.Data[0]["values"] = signalTot;
-        $scope.MFCC = MFCC;
+        $scope.MFCC = AllMFCC["MFCCDraw"];
         $scope.colors = Color["MFCC"];
+
         $scope.deltaColor = Color["delta"];
         $scope.deltadelta = Color["delta-delta"];
         interval = Color["interval"];
+
+        if ( angular.isDefined($scope.tmp1) ) {
+
+          console.log("D1");
+          console.log(dtw.distanceCumulee(AllMFCC["MFCC"],$scope.tmp1));
+
+          console.log("D2");
+          console.log(dtw.distanceCumulee(AllMFCC["Delta"],$scope.tmp2));
+
+          console.log("D3");
+          console.log(dtw.distanceCumulee(AllMFCC["DeltaDelta"],$scope.tmp3));
+        }
+
+        $scope.tmp1 = AllMFCC["MFCC"];
+        $scope.tmp2 = AllMFCC["Delta"];
+        $scope.tmp3 = AllMFCC["DeltaDelta"];
       });
     };
 
