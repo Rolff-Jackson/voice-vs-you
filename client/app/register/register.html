@@ -37,7 +37,7 @@
 
       <h1>MFCC
 
-        <h4>Coeff Cepstraux Image
+        <h4>Coeff Cepstraux MFCC Image
           <table>
             <tr>
               <td>
@@ -51,7 +51,7 @@
                 </table>
               </td>
               <td>
-                <div id="conteneur">
+                <div id="">
                   <table width="{{20*colors[0].length}}px">
                     <tr ng-repeat="case in colors track by $index" height="20px">
                       <!--<td width="20px"> {{$index + 1}} </td>-->
@@ -70,6 +70,8 @@
             </tr>
           </table>
         </h4>
+
+
 
         <h4>Coeff Cepstraux Barre
           <nvd3-multi-bar-chart
