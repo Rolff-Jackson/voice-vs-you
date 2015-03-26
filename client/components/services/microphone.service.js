@@ -100,12 +100,72 @@ angular.module('voiceVsYouApp')
       }, 400);
     }
 
-    function stopDraw(callback) {
+    function recodeSignal(sound,signalFiltre) {
+      var res = [];
+      res.push(signalFiltre);
+      res.push(signalFiltre);
 
-      var signalTot = [];
-      var MFCC = [];
-      var Color = [];
+      if ( angular.isDefined(sound) ) {
+        jsAudioRecorder.Recorder.exporDataWAV(function(blop) {
+          download(blop);
+        },sound);
+      }
+      if ( signalFiltre.length > 0 ) {
+        jsAudioRecorder.Recorder.exporDataWAV(function(blop) {
+          download(blop);
+        },res);
+      }
+    }
+
+    var startAlgo;
+
+    function taitementSignal(signal,sound,callback) {
       var cutData = [];
+      var signalTot = [];
+
+      var startCut = new Date();
+      FftService.cutSignal(signal).then(function (outputData) {
+
+        cutData = DrawService.drawCut(outputData);
+
+        var endCut = new Date();
+        console.log("Time algo cutSignal : " + (endCut-startCut) );
+        FftService.algoMFCC(outputData).then(function(coeffsMFCC) {
+
+          var infoMFCC = [{"MFCC": [],"color": [{"data":[],"interval":0}]}];
+
+          if ( coeffsMFCC.length > 0 ) {
+            infoMFCC = DrawService.drawMFCC(coeffsMFCC);
+          }
+
+          //show all curve
+          for(var k = 0;  k < sound.length;k += 128) {
+            signalTot.push([k,sound[k]]);
+          }
+
+          console.log("Time algo MFCC : " + (new Date()-endCut) );
+          console.log("All Time: " + (new Date()-startAlgo) );
+
+          callback(cutData,signalTot,infoMFCC["MFCC"],infoMFCC["color"])
+        });
+
+      });
+    }
+
+    function filtreEtTraitement(sound,callback) {
+
+      FftService.filtreFreq(sound[0],300,3400).then(function(signalFiltre) {
+
+        recodeSignal(sound,signalFiltre);
+
+        var endFiltre = new Date();
+        console.log("Time filtre: " + (endFiltre-startAlgo) );
+        taitementSignal(signalFiltre,sound[0],callback);
+
+      });
+    }
+
+    function stopDraw(callback) {
 
       if (angular.isDefined(boucle)) {
         $interval.cancel(boucle);
@@ -115,57 +175,9 @@ angular.module('voiceVsYouApp')
       jsAudioRecorder.Recorder.getBuffer(function(sound) {
         jsAudioRecorder.Recorder.stop();
 
-        var start  = new Date();
-        FftService.filtreFreq(sound[0],300,3400).then(function(signalFiltre) {
-          var res = [];
-          res.push(signalFiltre);
-          res.push(signalFiltre);
-
-          jsAudioRecorder.Recorder.exporDataWAV(function(blop) {
-            download(blop);
-
-            jsAudioRecorder.Recorder.exporDataWAV(function(blop) {
-              download(blop);
-            },sound);
-
-          },res);
-
-          var signal = signalFiltre; //sound[0]
-
-          var endFiltre = new Date();
-          console.log("Time filtre: " + (endFiltre-start) );
-
-          FftService.cutSignal(signal).then(function (outputData) {
-
-            cutData = DrawService.drawCut(outputData);
-
-            //for(var k=0; k < outputData.length;k++) {
-
-            var endCut = new Date();
-            console.log("Time algo cutSignal : " + (endCut-endFiltre) );
-            FftService.algoMFCC(outputData).then(function(coeffsMFCC) {
-
-              var infoMFCC = [{"MFCC": [],"color": [{"data":[],"interval":0}]}];
-
-              if ( coeffsMFCC.length > 0 ) {
-                infoMFCC = DrawService.drawMFCC(coeffsMFCC);
-              }
-
-              //show all curve
-              for(var k = 0;  k < sound[0].length;k += 128) {
-                signalTot.push([k,sound[0][k]]);
-              }
-
-              console.log("Time algo MFCC : " + (new Date()-endCut) );
-              console.log("All Time: " + (new Date()-start) );
-
-              callback(cutData,signalTot,infoMFCC["MFCC"],infoMFCC["color"])
-            });
-
-
-          });
-          //$scope.jsAudio.stopRecording('saveAndDownload');
-        });
+         startAlgo  = new Date();
+         //filtreEtTraitement(sound,callback);
+         taitementSignal(sound[0],sound[0],callback);
       });
     }
 

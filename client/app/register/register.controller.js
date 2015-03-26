@@ -52,7 +52,6 @@ angular.module('voiceVsYouApp')
         $scope.MFCC = MFCC;
         $scope.colors = Color["data"];
         interval = Color["interval"];
-
       });
     };
 

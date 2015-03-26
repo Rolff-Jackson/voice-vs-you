@@ -185,7 +185,7 @@ function algoMFCC(data,coeffsMFCC) {
         tmp = algoDCT(tmp);
 
         //sauvegarde des coefficients cepstraux
-        var normalize = normalizeMFCC(tmp);
+        //var normalize = normalizeMFCC(tmp);
 
         coeffsMFCC.push(tmp);
       }
