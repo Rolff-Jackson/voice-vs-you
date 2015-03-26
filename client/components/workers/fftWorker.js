@@ -457,8 +457,8 @@ function filtreMel(data,nbFiltre) {
 
 function logData(data) {
   for(var i = 0; i < data.length;i++) {
-    if ( data[i][1] > 0 ) {
-      data[i] = Math.log(data[i][1]);
+    if ( data[i][1] > -1 ) {
+      data[i] = Math.log(1 + data[i][1]);
     }
     else {
       data[i] = 0;
