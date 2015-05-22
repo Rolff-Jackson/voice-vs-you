@@ -4,21 +4,21 @@
 
 'use strict';
 
-var thing = require('./thing.model');
+var barycentre = require('./barycentre.model');
 
 exports.register = function(socket) {
-  thing.schema.post('save', function (doc) {
+  barycentre.schema.post('save', function (doc) {
     onSave(socket, doc);
   });
-  thing.schema.post('remove', function (doc) {
+  barycentre.schema.post('remove', function (doc) {
     onRemove(socket, doc);
   });
 }
 
 function onSave(socket, doc, cb) {
-  socket.emit('thing:save', doc);
+  socket.emit('barycentre:save', doc);
 }
 
 function onRemove(socket, doc, cb) {
-  socket.emit('thing:remove', doc);
+  socket.emit('barycentre:remove', doc);
 }

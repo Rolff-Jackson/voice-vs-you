@@ -1,0 +1,38 @@
+<span>Which is your voice ?</span>
+<h1>{{who}}</h1>
+<div id="">
+      <button type="button" class="btn btn-default" ng-click="startRecordingData()">Read</button>
+      <button type="button" class="btn btn-default" ng-click="stopRecordingData()">Stop</button>
+      <button type="button" class="btn btn-default" ng-click="clearData()">Clear</button>
+
+      <h1>Sound</h1>
+
+      <nvd3-line-with-focus-chart
+        data="Data"
+        id="VoiceData"
+        width="1000"
+        height="500"
+
+
+        xAxisTickFormat="xAxisTickFormatSignal()"
+        yAxisTickFormat="yAxisTickFormatFunction()"
+        x2AxisTickFormat="xAxisTickFormatSignal()"
+        y2AxisTickFormat="yAxisTickFormatFunction()"
+
+        forcey="[-1,1]"
+
+
+        showXAxis="true"
+        showYAxis="true"
+
+        objectequality="true"
+        showLegend="true"
+
+        noData="No Data For You!"
+
+        interactive="true"
+        tooltips="true">
+        <svg></svg>
+      </nvd3-line-with-focus-chart>
+
+</div>

@@ -47,14 +47,18 @@ angular.module('voiceVsYouApp')
     }
 
     // A, B ligne fenetre de Hamming  ; colonne les coeffs MFCC ( A test, B ref )
+    // problem n,m matrice algo DTW
     function distanceCumulee(A, B) {
       var n = A.length;
-      var m = A[0].length;
 
-      var DTW = initdistance(n,m);
+      if (B.length < n ) {
+        n = B.length;
+      }
+
+      var DTW = initdistance(n,n);
 
       for (var i = 1; i < n; i++) {
-        for (var j = 1; j < m; j++) {
+        for (var j = 1; j < n; j++) {
 
           var cout = distanceVecteurs(A[i],B[j]);
           DTW[i][j] = cout + mini3(DTW[i - 1][j], DTW[i][j - 1], DTW[i - 1][j - 1]);
@@ -62,7 +66,7 @@ angular.module('voiceVsYouApp')
         }
       }
 
-      return DTW[n-1][m-1];
+      return DTW[n-1][n-1];
     }
 
     return {
@@ -70,5 +74,10 @@ angular.module('voiceVsYouApp')
         return distanceCumulee(A,B);
       }
     }
+
+    // AllMFCC["MFCC"] AllMFCC["Delta"] AllMFCC["DeltaDelta"]
+    /*
+        console.log(dtw.distanceCumulee(AllMFCC["MFCC"],$scope.tmp1));
+    */
 
   }]);

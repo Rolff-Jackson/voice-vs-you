@@ -547,6 +547,8 @@ function inverseFFT(dataC,incr) {
 function signalDetection(data) {
   var seuil = 0.05;
   var seuilB = 0.02;
+  var seuilObli = 0.1;
+
   var res = [];
   var tmp = [];
 
@@ -556,6 +558,9 @@ function signalDetection(data) {
 
   var MAXDATABRUIT = 50*128;
   var nbEltAnalyse = data.length;
+
+  var max = -1;
+
 
   // ajout min max amplitude sound ( moyenne de tout les sound ) + longeur moyenne detect signal
   for(var i = 0; i < nbEltAnalyse;i++) {
@@ -568,8 +573,13 @@ function signalDetection(data) {
         cmpt = 0;
         cmpt2 = 0;
       }
+
+      if ( Math.abs(data[i]) > max ) {
+        max = Math.abs(data[i]);
+      }
     }
 
+    // detection d'un bruit
     if ( register ) {
 
       if (Math.abs(data[i]) <= seuilB) {
@@ -582,18 +592,24 @@ function signalDetection(data) {
 
     }
 
+    // enregistrement si on a un bruit trop long
     if ( (cmpt > MAXDATABRUIT) || (cmpt2 > MAXDATABRUIT) ) {
-      var n = tmp.length;
-      var sub = tmp.slice(0,n-cmpt);
-      res.push(sub);
+      if ( max > seuilObli ) {
+        var n = tmp.length;
+        var sub = tmp.slice(0,n-cmpt);
+        res.push(sub);
+      }
+
       tmp = [];
       cmpt = 0;
       cmpt2 = 0;
+      max = -1;
+
       register = false;
     }
   }
 
-  if ( tmp.length > 0 ) {
+  if ( (tmp.length > 0)  && (max > seuilObli) ) {
     var n = tmp.length;
 
     var sub = tmp.slice(0,n-cmpt);
@@ -603,6 +619,3 @@ function signalDetection(data) {
 
   return res;
 }
-
-
-

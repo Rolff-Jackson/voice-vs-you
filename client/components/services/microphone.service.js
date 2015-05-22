@@ -132,7 +132,7 @@ angular.module('voiceVsYouApp')
         console.log("Time algo cutSignal : " + (endCut-startCut) );
         FftService.algoMFCC(outputData).then(function(coeffsMFCC) {
 
-          var infoMFCC = [{"MFCC": [],"color": [{"data":[],"interval":0}]}];
+          var infoMFCC = {"AllMFCC": {},"color":{}};
 
           if ( coeffsMFCC.length > 0 ) {
             infoMFCC = DrawService.drawMFCC(coeffsMFCC);
@@ -196,5 +196,3 @@ angular.module('voiceVsYouApp')
       }
     }
   }]);
-
-

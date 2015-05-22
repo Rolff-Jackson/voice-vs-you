@@ -1,9 +1,20 @@
+    <form name="myForm">
+      <label>Username:
+        <input type="text" name="input" ng-model="id.username" ng-change="undisable()" required>
+      </label>
+      <div role="alert">
+        <span class="error" ng-show="myForm.input.$error.required">
+          Required!</span>
+        <span class="error" ng-show="myForm.input.$error.pattern">
+          Single word only!</span>
+      </div>
+    </form>
 
     <span>Register your voice</span>
     <div id="">
-      <button type="button" class="btn btn-default" ng-click="startRecordingData()">Read</button>
-      <button type="button" class="btn btn-default" ng-click="stopRecordingData()">Stop</button>
-      <button type="button" class="btn btn-default" ng-click="clearData()">Clear</button>
+      <button type="button" class="btn btn-default" ng-class="{'disabled': disable}" ng-click="startRecordingData()">Read</button>
+      <button type="button" class="btn btn-default" ng-class="{'disabled': disable}" ng-click="stopRecordingData()">Stop</button>
+      <button type="button" class="btn btn-default" ng-class="{'disabled': disable}" ng-click="clearData()">Clear</button>
 
       <h1>Sound</h1>
 

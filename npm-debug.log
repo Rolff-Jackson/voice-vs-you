@@ -1,0 +1,207 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node',
+1 verbose cli   '/usr/local/bin/npm',
+1 verbose cli   'install',
+1 verbose cli   '-g',
+1 verbose cli   'generator-angular-fullstack' ]
+2 info using npm@2.7.5
+3 info using node@v0.12.2
+4 verbose node symlink /usr/local/bin/node
+5 silly cache add args [ 'generator-angular-fullstack', null ]
+6 verbose cache add spec generator-angular-fullstack
+7 silly cache add parsed spec { raw: 'generator-angular-fullstack',
+7 silly cache add   scope: null,
+7 silly cache add   name: 'generator-angular-fullstack',
+7 silly cache add   rawSpec: '',
+7 silly cache add   spec: '*',
+7 silly cache add   type: 'range' }
+8 verbose addNamed generator-angular-fullstack@*
+9 silly addNamed semver.valid null
+10 silly addNamed semver.validRange *
+11 silly addNameRange { name: 'generator-angular-fullstack',
+11 silly addNameRange   range: '*',
+11 silly addNameRange   hasData: false }
+12 silly mapToRegistry name generator-angular-fullstack
+13 silly mapToRegistry using default registry
+14 silly mapToRegistry registry https://registry.npmjs.org/
+15 silly mapToRegistry uri https://registry.npmjs.org/generator-angular-fullstack
+16 verbose addNameRange registry:https://registry.npmjs.org/generator-angular-fullstack not in flight; fetching
+17 verbose request uri https://registry.npmjs.org/generator-angular-fullstack
+18 verbose request no auth needed
+19 info attempt registry request try #1 at 09:55:30
+20 verbose request id 519eba7fba911785
+21 verbose etag "8N8J5988INGB7R8UUCOUJM2D5"
+22 http request GET https://registry.npmjs.org/generator-angular-fullstack
+23 http 304 https://registry.npmjs.org/generator-angular-fullstack
+24 silly get cb [ 304,
+24 silly get   { date: 'Thu, 21 May 2015 07:55:29 GMT',
+24 silly get     via: '1.1 varnish',
+24 silly get     'cache-control': 'max-age=60',
+24 silly get     etag: '"8N8J5988INGB7R8UUCOUJM2D5"',
+24 silly get     age: '0',
+24 silly get     connection: 'keep-alive',
+24 silly get     'x-served-by': 'cache-fra1240-FRA',
+24 silly get     'x-cache': 'HIT',
+24 silly get     'x-cache-hits': '1',
+24 silly get     'x-timer': 'S1432194929.421571,VS0,VE711',
+24 silly get     vary: 'Accept' } ]
+25 verbose etag https://registry.npmjs.org/generator-angular-fullstack from cache
+26 verbose get saving generator-angular-fullstack to /Users/thomasmazurkiewicz/.npm/registry.npmjs.org/generator-angular-fullstack/.cache.json
+27 silly addNameRange number 2 { name: 'generator-angular-fullstack',
+27 silly addNameRange   range: '*',
+27 silly addNameRange   hasData: true }
+28 silly addNameRange versions [ 'generator-angular-fullstack',
+28 silly addNameRange   [ '0.0.1',
+28 silly addNameRange     '0.0.2',
+28 silly addNameRange     '0.0.3',
+28 silly addNameRange     '0.0.4',
+28 silly addNameRange     '0.0.5',
+28 silly addNameRange     '0.1.0',
+28 silly addNameRange     '0.2.0',
+28 silly addNameRange     '1.0.0',
+28 silly addNameRange     '1.0.1',
+28 silly addNameRange     '1.1.0',
+28 silly addNameRange     '1.1.1',
+28 silly addNameRange     '1.2.0',
+28 silly addNameRange     '1.2.1',
+28 silly addNameRange     '1.2.2',
+28 silly addNameRange     '1.2.3',
+28 silly addNameRange     '1.2.4',
+28 silly addNameRange     '1.2.5',
+28 silly addNameRange     '1.2.6',
+28 silly addNameRange     '1.2.7',
+28 silly addNameRange     '1.3.0',
+28 silly addNameRange     '1.3.1',
+28 silly addNameRange     '1.3.2',
+28 silly addNameRange     '1.3.3',
+28 silly addNameRange     '1.4.0',
+28 silly addNameRange     '1.4.1',
+28 silly addNameRange     '1.4.2',
+28 silly addNameRange     '1.4.3',
+28 silly addNameRange     '2.0.0-rc1',
+28 silly addNameRange     '2.0.0',
+28 silly addNameRange     '2.0.1',
+28 silly addNameRange     '2.0.2',
+28 silly addNameRange     '2.0.3',
+28 silly addNameRange     '2.0.4',
+28 silly addNameRange     '2.0.5',
+28 silly addNameRange     '2.0.6',
+28 silly addNameRange     '2.0.7',
+28 silly addNameRange     '2.0.8',
+28 silly addNameRange     '2.0.9',
+28 silly addNameRange     '2.0.10',
+28 silly addNameRange     '2.0.11',
+28 silly addNameRange     '2.0.12',
+28 silly addNameRange     '2.0.13' ] ]
+29 verbose addNamed generator-angular-fullstack@2.0.13
+30 silly addNamed semver.valid 2.0.13
+31 silly addNamed semver.validRange 2.0.13
+32 silly cache afterAdd generator-angular-fullstack@2.0.13
+33 verbose afterAdd /Users/thomasmazurkiewicz/.npm/generator-angular-fullstack/2.0.13/package/package.json not in flight; writing
+34 verbose afterAdd /Users/thomasmazurkiewicz/.npm/generator-angular-fullstack/2.0.13/package/package.json written
+35 silly install resolved [ { name: 'generator-angular-fullstack',
+35 silly install resolved     version: '2.0.13',
+35 silly install resolved     description: 'Yeoman generator for creating MEAN stack applications, using MongoDB, Express, AngularJS, and Node',
+35 silly install resolved     keywords:
+35 silly install resolved      [ 'yeoman-generator',
+35 silly install resolved        'mean',
+35 silly install resolved        'mongodb',
+35 silly install resolved        'angularjs',
+35 silly install resolved        'express',
+35 silly install resolved        'scaffold',
+35 silly install resolved        'fullstack',
+35 silly install resolved        'framework',
+35 silly install resolved        'component',
+35 silly install resolved        'front-end',
+35 silly install resolved        'app' ],
+35 silly install resolved     homepage: 'https://github.com/DaftMonk/generator-angular-fullstack',
+35 silly install resolved     bugs: { url: 'https://github.com/DaftMonk/generator-angular-fullstack/issues' },
+35 silly install resolved     author: { name: 'Tyler Henkel' },
+35 silly install resolved     repository:
+35 silly install resolved      { type: 'git',
+35 silly install resolved        url: 'git://github.com/DaftMonk/generator-angular-fullstack.git' },
+35 silly install resolved     scripts: { test: 'grunt test' },
+35 silly install resolved     dependencies:
+35 silly install resolved      { 'yeoman-generator': '~0.17.0',
+35 silly install resolved        chalk: '~0.4.0',
+35 silly install resolved        wiredep: '~0.4.2',
+35 silly install resolved        'generator-ng-component': '~0.0.4' },
+35 silly install resolved     peerDependencies: { yo: '>=1.2.0' },
+35 silly install resolved     devDependencies:
+35 silly install resolved      { chai: '^1.9.1',
+35 silly install resolved        'fs-extra': '^0.9.1',
+35 silly install resolved        grunt: '~0.4.1',
+35 silly install resolved        'grunt-build-control': 'git://github.com/DaftMonk/grunt-build-control',
+35 silly install resolved        'grunt-contrib-clean': '^0.6.0',
+35 silly install resolved        'grunt-contrib-jshint': '^0.10.0',
+35 silly install resolved        'grunt-conventional-changelog': '~1.0.0',
+35 silly install resolved        'grunt-mocha-test': '^0.11.0',
+35 silly install resolved        'grunt-release': '~0.6.0',
+35 silly install resolved        'load-grunt-tasks': '~0.2.0',
+35 silly install resolved        marked: '~0.2.8',
+35 silly install resolved        mocha: '~1.21.0',
+35 silly install resolved        q: '^1.0.1',
+35 silly install resolved        semver: '~2.2.1',
+35 silly install resolved        shelljs: '^0.3.0',
+35 silly install resolved        'underscore.string': '^2.3.3' },
+35 silly install resolved     engines: { node: '>=0.10.0', npm: '>=1.2.10' },
+35 silly install resolved     licenses: [ [Object] ],
+35 silly install resolved     _id: 'generator-angular-fullstack@2.0.13',
+35 silly install resolved     _shasum: '866333e9ca1e557336342b57b585582f65dd61bb',
+35 silly install resolved     _from: 'generator-angular-fullstack@*',
+35 silly install resolved     _npmVersion: '1.4.10',
+35 silly install resolved     _npmUser: { name: 'daftmonk', email: 'tylerhenkel@hotmail.com' },
+35 silly install resolved     maintainers: [ [Object] ],
+35 silly install resolved     dist:
+35 silly install resolved      { shasum: '866333e9ca1e557336342b57b585582f65dd61bb',
+35 silly install resolved        tarball: 'http://registry.npmjs.org/generator-angular-fullstack/-/generator-angular-fullstack-2.0.13.tgz' },
+35 silly install resolved     directories: {},
+35 silly install resolved     _resolved: 'https://registry.npmjs.org/generator-angular-fullstack/-/generator-angular-fullstack-2.0.13.tgz',
+35 silly install resolved     readme: 'ERROR: No README data found!' } ]
+36 info install generator-angular-fullstack@2.0.13 into /Users/thomasmazurkiewicz/npm-global/lib
+37 info installOne generator-angular-fullstack@2.0.13
+38 verbose installOne of generator-angular-fullstack to /Users/thomasmazurkiewicz/npm-global/lib not in flight; installing
+39 verbose lock using /Users/thomasmazurkiewicz/.npm/_locks/generator-angular-fullst-088b50eb1fcc8a7d.lock for /Users/thomasmazurkiewicz/npm-global/lib/node_modules/generator-angular-fullstack
+40 silly install write writing generator-angular-fullstack 2.0.13 to /Users/thomasmazurkiewicz/npm-global/lib/node_modules/generator-angular-fullstack
+41 silly cache addNamed cb generator-angular-fullstack@2.0.13
+42 verbose unbuild lib/node_modules/generator-angular-fullstack
+43 info preuninstall generator-angular-fullstack@2.0.13
+44 info uninstall generator-angular-fullstack@2.0.13
+45 verbose unbuild rmStuff generator-angular-fullstack@2.0.13 from /Users/thomasmazurkiewicz/npm-global/lib/node_modules
+46 info postuninstall generator-angular-fullstack@2.0.13
+47 silly gentlyRm /Users/thomasmazurkiewicz/npm-global/lib/node_modules/generator-angular-fullstack is being purged from base /Users/thomasmazurkiewicz/npm-global
+48 verbose gentlyRm don't care about contents; nuking /Users/thomasmazurkiewicz/npm-global/lib/node_modules/generator-angular-fullstack
+49 silly vacuum-fs purging /Users/thomasmazurkiewicz/npm-global/lib/node_modules/generator-angular-fullstack
+50 verbose unlock done using /Users/thomasmazurkiewicz/.npm/_locks/generator-angular-fullst-088b50eb1fcc8a7d.lock for /Users/thomasmazurkiewicz/npm-global/lib/node_modules/generator-angular-fullstack
+51 verbose stack Error: EACCES, unlink '/Users/thomasmazurkiewicz/npm-global/lib/node_modules/generator-angular-fullstack/.editorconfig'
+51 verbose stack     at Error (native)
+52 verbose cwd /Users/thomasmazurkiewicz/Documents/Programmation/AngularJS/voice-vs-you_V2
+53 error Darwin 14.3.0
+54 error argv "node" "/usr/local/bin/npm" "install" "-g" "generator-angular-fullstack"
+55 error node v0.12.2
+56 error npm  v2.7.5
+57 error path /Users/thomasmazurkiewicz/npm-global/lib/node_modules/generator-angular-fullstack/.editorconfig
+58 error code EACCES
+59 error errno -13
+60 error Error: EACCES, unlink '/Users/thomasmazurkiewicz/npm-global/lib/node_modules/generator-angular-fullstack/.editorconfig'
+60 error     at Error (native)
+60 error  { [Error: EACCES, unlink '/Users/thomasmazurkiewicz/npm-global/lib/node_modules/generator-angular-fullstack/.editorconfig']
+60 error   errno: -13,
+60 error   code: 'EACCES',
+60 error   path: '/Users/thomasmazurkiewicz/npm-global/lib/node_modules/generator-angular-fullstack/.editorconfig' }
+61 error Please try running this command again as root/Administrator.
+62 verbose exit [ -13, true ]
+63 verbose unbuild lib/node_modules/generator-angular-fullstack
+64 info preuninstall generator-angular-fullstack@2.0.13
+65 info uninstall generator-angular-fullstack@2.0.13
+66 verbose unbuild rmStuff generator-angular-fullstack@2.0.13 from /Users/thomasmazurkiewicz/npm-global/lib/node_modules
+67 info postuninstall generator-angular-fullstack@2.0.13
+68 silly gentlyRm /Users/thomasmazurkiewicz/npm-global/lib/node_modules/generator-angular-fullstack is being purged from base /Users/thomasmazurkiewicz/npm-global
+69 verbose gentlyRm don't care about contents; nuking /Users/thomasmazurkiewicz/npm-global/lib/node_modules/generator-angular-fullstack
+70 silly vacuum-fs purging /Users/thomasmazurkiewicz/npm-global/lib/node_modules/generator-angular-fullstack
+71 error error rolling back Error: EACCES, unlink '/Users/thomasmazurkiewicz/npm-global/lib/node_modules/generator-angular-fullstack/.editorconfig'
+71 error error rolling back     at Error (native)
+71 error error rolling back  { [Error: EACCES, unlink '/Users/thomasmazurkiewicz/npm-global/lib/node_modules/generator-angular-fullstack/.editorconfig']
+71 error error rolling back   errno: -13,
+71 error error rolling back   code: 'EACCES',
+71 error error rolling back   path: '/Users/thomasmazurkiewicz/npm-global/lib/node_modules/generator-angular-fullstack/.editorconfig' }

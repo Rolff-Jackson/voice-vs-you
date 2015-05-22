@@ -1,29 +1,8 @@
 'use strict';
 
 angular.module('voiceVsYouApp')
-  .controller('MainCtrl', function ($scope, $http,$location, socket) {
+  .controller('MainCtrl', ['$scope','$http','$location','socket','Analyse' ,function ($scope, $http,$location, socket,Analyse) {
     $scope.awesomeThings = [];
-
-    $http.get('/api/things').success(function(awesomeThings) {
-      $scope.awesomeThings = awesomeThings;
-      socket.syncUpdates('thing', $scope.awesomeThings);
-    });
-
-    $scope.addThing = function() {
-      if($scope.newThing === '') {
-        return;
-      }
-      $http.post('/api/things', { name: $scope.newThing });
-      $scope.newThing = '';
-    };
-
-    $scope.deleteThing = function(thing) {
-      $http.delete('/api/things/' + thing._id);
-    };
-
-    $scope.$on('$destroy', function () {
-      socket.unsyncUpdates('thing');
-    });
 
     $scope.changeView = function(view){
       $location.path(view); // path not hash
@@ -62,6 +41,21 @@ angular.module('voiceVsYouApp')
       return audio5js;
     }
 
+    var points = [];
+    points.push([-1,1]);
+    points.push([-1,0]);
+    points.push([-5,-6]);
+    points.push([6,5]);
+    points.push([8,6]);
+    points.push([1,2]);
+    //points,nbClass,dimension,valMax,maxError
+    var info = Analyse.k_mean([],points,3,10,1).then(function(info){
+      console.log(info);
+      Analyse.minDistance(points,info.bary,info.sizeClass).then(function(res){
+        console.log("Min: " + res);
+      })
+    });
+
     $scope.audio = initAudio();
 
-  });
+  }]);
