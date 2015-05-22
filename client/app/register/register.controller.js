@@ -87,8 +87,11 @@ angular.module('voiceVsYouApp')
         var points = concatMFCC(AllMFCC);
 
         //baryRef,points,nbClass,dimension,valMax,maxError
+        var start = new Date();
+
         $http.get('/api/barycentres/' + username).success(function(info) {
           Analyse.k_mean(info,points,20,2,1).then(function(elt) {
+            console.log("Time k_mean: " + new Date() - start);
             if ( info.length > 0 ) {
               $http.delete('/api/barycentres/' + info[0]._id);
             }

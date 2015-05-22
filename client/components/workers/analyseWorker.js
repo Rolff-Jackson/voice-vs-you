@@ -129,11 +129,9 @@ function bestVoice(allInfo,points) {
   for(var i = 0; i < allInfo.length; i++) {
     var barycentres = allInfo[i].barycentre;
     var sizeClass = allInfo[i].sizeClass;
-    console.log(barycentres);
-
     var res = minDistance(points,barycentres,sizeClass);
 
-    console.log(i + ":" + res);
+    console.log("Personne: " + allInfo[i].name + " Distance min:" + res);
 
     if ( (res < min) || (min < 0) ) {
       min = res;

@@ -68,10 +68,12 @@ angular.module('voiceVsYouApp')
         $scope.MFCC = AllMFCC["MFCCDraw"];
 
         var points = concatMFCC(AllMFCC);
-        
+        var start = new Date();
+
         //baryRef,points,nbClass,dimension,valMax,maxError
         $http.get('/api/barycentres').success(function(info) {
           Analyse.bestVoice(info,points).then(function(who) {
+            console.log("Time bestVoice: " + (new Date() - start) );
             $scope.who="You are " + who;
             console.log(who);
           });
