@@ -157,16 +157,17 @@ function minDistance(points,barycentres,sizeClass) {
         vectDiff = diffVector(barycentres[j],points[i]);
         norme = Neuclidienne(vectDiff);
 
-        if ( (sizeClass[j] > 0) && (norme < min) || (min < 0) ) {
+        if ( (sizeClass[j] > 0) && ( (norme < min) || (min < 0) ) ) {
           min = norme;
           indiceMin = j;
         }
     }
-    res += sizeClass[indiceMin] * min;
-    somme += sizeClass[indiceMin];
+    if ( min > -1 ) {
+      res += min;
+    }
   }
 
-  return (res/somme);
+  return (res);
 }
 
 function k_mean(info,points,nbClass,valMax,maxError) {
@@ -212,7 +213,7 @@ function k_mean(info,points,nbClass,valMax,maxError) {
     }
     maxBoucle++;
     //test bary stabilise
-  } while( !stabiliseBary(barycentres,oldClass,maxError) && (maxBoucle < 1000) );
+  } while( !stabiliseBary(barycentres,oldClass,maxError) && (maxBoucle < 5000) );
   console.log("boucle algo: " + maxBoucle);
   return {bary: barycentres,sizeClass: sizeClass};
 }
